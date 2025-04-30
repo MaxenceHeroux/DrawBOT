@@ -13,10 +13,12 @@ void setup() {
   Enable_encodeur();
   //I2C 
 
+  //Wifi
+  Enable_wifi();
 }
 
 void loop() {
-  
+  server.handleClient(); //wifi
 
   if(DEBUG){
     //DEBUG_Blink();

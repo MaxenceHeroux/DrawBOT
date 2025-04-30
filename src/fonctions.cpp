@@ -109,3 +109,36 @@ void DEBUG_encodeur(void){
     Serial.println(nb_tic_encodeur_D);
     delay(500);
 }
+
+const char* ssid = "DrawBOT";
+const char* password = "DrawBOT1234";
+WebServer server(80); //port 80 
+
+// Page HTML à servir
+String htmlPage = R"rawliteral(
+    <!DOCTYPE html>
+    <html>
+    <head><title>ESP32 Page</title></head>
+    <body>
+      <h1>Bienvenue sur l'ESP32</h1>
+      <p>Page servie depuis l'ESP32 en mode Point d'Accès</p>
+    </body>
+    </html>
+    )rawliteral";
+
+void handleRoot() {
+    server.send(200, "text/html", htmlPage);
+}
+
+void Enable_wifi(void){
+    // Démarrer l'ESP32 en point d'accès
+    WiFi.softAP(ssid, password);
+    Serial.println("Point d'accès Wi-Fi actif !");
+    Serial.print("Adresse IP : ");
+    Serial.println(WiFi.softAPIP());  // => 192.168.4.1 par défaut
+
+    // Configurer le serveur web
+    server.on("/", handleRoot);
+    server.begin();
+    Serial.println("Serveur HTTP lancé.");
+}

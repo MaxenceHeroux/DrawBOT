@@ -49,3 +49,10 @@ void IRAM_ATTR ENC_ISIR_D();
 void IRAM_ATTR ENC_ISIR_G();
 void Enable_encodeur(void);
 void DEBUG_encodeur(void);
+
+#include<WiFi.h>
+#include <WebServer.h>
+extern WebServer server;
+
+void Enable_wifi(void);
+      
