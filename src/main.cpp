@@ -1,7 +1,8 @@
 #include <lib.h>
 
-
 void setup() {
+  Serial.begin(9600);
+
   pinMode(LEDU1, OUTPUT); //orange
   pinMode(LEDU2, OUTPUT); //bleu
   //moteurs
@@ -9,17 +10,17 @@ void setup() {
   //PWM
   Enable_PWM();
   //Encodeur
-  pinMode(ENC_D_CH_A, INPUT);
-  pinMode(ENC_D_CH_A, INPUT);
-  pinMode(ENC_G_CH_A, INPUT);
-  pinMode(ENC_G_CH_B, INPUT);
+  Enable_encodeur();
   //I2C 
 
 }
 
 void loop() {
+  
+
   if(DEBUG){
-    DEBUG_Blink();
-    DEBUG_pwm();
+    //DEBUG_Blink();
+    //DEBUG_pwm();
+    DEBUG_encodeur();
   }
 }

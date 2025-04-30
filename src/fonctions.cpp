@@ -64,3 +64,48 @@ void DEBUG_pwm(void){
     PWM(pwmChannel_MD,255,true);
     PWM(pwmChannel_MG,255,false);
 }
+
+void IRAM_ATTR ENC_ISIR_D() {
+    bool A = digitalRead(ENC_D_CH_A);
+    bool B = digitalRead(ENC_D_CH_B);
+  
+    // Si A a changé, on regarde B pour le sens
+    if (A == B) {
+        nb_tic_encodeur_D++;    // Sens avant
+    } else {
+        nb_tic_encodeur_D--;    // Sens arrière
+    }
+}
+
+void IRAM_ATTR ENC_ISIR_G() {
+    bool A = digitalRead(ENC_G_CH_A);
+    bool B = digitalRead(ENC_G_CH_B);
+  
+    // Si A a changé, on regarde B pour le sens
+    if (A == B) {
+        nb_tic_encodeur_G--;    // Sens arrière
+    } else {
+        nb_tic_encodeur_G++;    // Sens avant
+    }
+}
+
+long nb_tic_encodeur_D;
+long nb_tic_encodeur_G;
+void Enable_encodeur(void){
+    pinMode(ENC_D_CH_A, INPUT_PULLUP);
+    pinMode(ENC_D_CH_A, INPUT_PULLUP);
+    pinMode(ENC_G_CH_A, INPUT_PULLUP);
+    pinMode(ENC_G_CH_B, INPUT_PULLUP);
+    nb_tic_encodeur_D =0;
+    nb_tic_encodeur_G =0;
+    attachInterrupt(digitalPinToInterrupt(ENC_D_CH_A), ENC_ISIR_D, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(ENC_G_CH_A), ENC_ISIR_G, CHANGE);
+}
+
+void DEBUG_encodeur(void){
+    Serial.print("Ticks avec sens :   G:");
+    Serial.print(nb_tic_encodeur_G);
+    Serial.print("   D:");
+    Serial.println(nb_tic_encodeur_D);
+    delay(500);
+}
