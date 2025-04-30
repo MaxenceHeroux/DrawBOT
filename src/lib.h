@@ -53,6 +53,8 @@ void DEBUG_encodeur(void);
 #include<WiFi.h>
 #include <WebServer.h>
 extern WebServer server;
+extern String htmlPage;
 
 void Enable_wifi(void);
-      
+
+extern int YY;

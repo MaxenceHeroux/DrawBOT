@@ -114,31 +114,35 @@ const char* ssid = "DrawBOT";
 const char* password = "DrawBOT1234";
 WebServer server(80); //port 80 
 
-// Page HTML à servir
-String htmlPage = R"rawliteral(
-    <!DOCTYPE html>
-    <html>
-    <head><title>ESP32 Page</title></head>
-    <body>
-      <h1>Bienvenue sur l'ESP32</h1>
-      <p>Page servie depuis l'ESP32 en mode Point d'Accès</p>
-    </body>
-    </html>
-    )rawliteral";
 
 void handleRoot() {
     server.send(200, "text/html", htmlPage);
 }
 
 void Enable_wifi(void){
+    // Définir l'IP statique pour le point d'accès
+    IPAddress local_IP(192, 168, 14, 14);     // nouvelle IP
+    IPAddress gateway(192, 168, 14, 14);      // souvent identique en mode AP
+    IPAddress subnet(255, 255, 255, 0);       // masque
+    WiFi.softAPConfig(local_IP, gateway, subnet);
+
     // Démarrer l'ESP32 en point d'accès
     WiFi.softAP(ssid, password);
     Serial.println("Point d'accès Wi-Fi actif !");
     Serial.print("Adresse IP : ");
-    Serial.println(WiFi.softAPIP());  // => 192.168.4.1 par défaut
+    Serial.println(WiFi.softAPIP());  //192.168.14.14
 
     // Configurer le serveur web
-    server.on("/", handleRoot);
+    server.on("/", handleRoot); //page principale 
+
+    server.on("/joy", HTTP_GET, []() { //retour valeurs
+        int x = server.arg("x").toInt(); 
+        int y = server.arg("y").toInt();
+        Serial.printf("Joystick (entiers) : X=%d, Y=%d\n", x, y);
+        server.send(200, "text/plain", "OK");
+    });
+
+
     server.begin();
     Serial.println("Serveur HTTP lancé.");
 }

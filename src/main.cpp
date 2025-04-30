@@ -17,8 +17,11 @@ void setup() {
   Enable_wifi();
 }
 
+int YY;
 void loop() {
   server.handleClient(); //wifi
+  // PWM(pwmChannel_MD,YY,true);
+  // PWM(pwmChannel_MG,YY,true);
 
   if(DEBUG){
     //DEBUG_Blink();
