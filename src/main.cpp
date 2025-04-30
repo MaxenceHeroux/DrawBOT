@@ -1,17 +1,25 @@
-#include <Arduino.h>
+#include <lib.h>
 
 void setup() {
-  pinMode(25, OUTPUT);  // Définit GPIO 25 comme une sortie
-  pinMode(26, OUTPUT);  // Définit GPIO 25 comme une sortie
+  pinMode(LEDU1, OUTPUT);
+  pinMode(LEDU2, OUTPUT);
+  //moteurs
+  pinMode(EN_D, OUTPUT);
+  pinMode(EN_G, OUTPUT);
+  //PWM
+  pinMode(IN_1_D, OUTPUT);
+  pinMode(IN_2_D, OUTPUT);
+  pinMode(IN_1_G, OUTPUT);
+  pinMode(IN_2_G, OUTPUT);
+  //Encodeur
+  pinMode(ENC_D_CH_A, INPUT);
+  pinMode(ENC_D_CH_A, INPUT);
+  pinMode(ENC_G_CH_A, INPUT);
+  pinMode(ENC_G_CH_B, INPUT);
+  //I2C 
+
 }
 
 void loop() {
-  digitalWrite(25, HIGH);  // Allume la LED
-  digitalWrite(26, HIGH);  // Allume la LED
-  delay(500);              // Attend 500 ms
-  digitalWrite(25, LOW);   // Éteint la LED
-  digitalWrite(26, LOW);   // Éteint la LED
-  delay(500);              // Attend 500 ms
+  Blink();
 }
-
-
