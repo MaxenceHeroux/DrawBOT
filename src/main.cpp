@@ -1,16 +1,13 @@
 #include <lib.h>
 
+
 void setup() {
-  pinMode(LEDU1, OUTPUT);
-  pinMode(LEDU2, OUTPUT);
+  pinMode(LEDU1, OUTPUT); //orange
+  pinMode(LEDU2, OUTPUT); //bleu
   //moteurs
-  pinMode(EN_D, OUTPUT);
-  pinMode(EN_G, OUTPUT);
+  Enable_moteur();
   //PWM
-  pinMode(IN_1_D, OUTPUT);
-  pinMode(IN_2_D, OUTPUT);
-  pinMode(IN_1_G, OUTPUT);
-  pinMode(IN_2_G, OUTPUT);
+  Enable_PWM();
   //Encodeur
   pinMode(ENC_D_CH_A, INPUT);
   pinMode(ENC_D_CH_A, INPUT);
@@ -21,5 +18,8 @@ void setup() {
 }
 
 void loop() {
-  Blink();
+  if(DEBUG){
+    DEBUG_Blink();
+    DEBUG_pwm();
+  }
 }
