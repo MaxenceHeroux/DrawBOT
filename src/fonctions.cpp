@@ -17,52 +17,60 @@ void Enable_moteur(void){
     digitalWrite(EN_G, HIGH);
 }
 
+void Disable_moteur(void){
+    pinMode(EN_D, OUTPUT);
+    pinMode(EN_G, OUTPUT);
+    //enable
+    digitalWrite(EN_D, LOW);
+    digitalWrite(EN_G, LOW);
+}
+
 void Enable_PWM(void){
     //PWM moteur 1
     pinMode(IN_1_D, OUTPUT);
     pinMode(IN_2_D, OUTPUT);
-    ledcSetup(pwmChannel_MD, freq, resolution);
-    ledcAttachPin(IN_1_D, pwmChannel_MD);
-    digitalWrite(IN_2_D, LOW);  //Direction par defaut (Avant)
+    ledcSetup(pwmChannel_MD_1, freq, resolution);
+    ledcAttachPin(IN_1_D, pwmChannel_MD_1);
+    ledcSetup(pwmChannel_MD_2, freq, resolution);
+    ledcAttachPin(IN_2_D, pwmChannel_MD_2);
 
     //PWM moteur 2
     pinMode(IN_1_G, OUTPUT);
     pinMode(IN_2_G, OUTPUT);
-    ledcSetup(pwmChannel_MG, freq, resolution);
-    ledcAttachPin(IN_1_G, pwmChannel_MG);
-    digitalWrite(IN_2_G, HIGH);  //Direction par defaut (Avant)
+    ledcSetup(pwmChannel_MG_1, freq, resolution);
+    ledcAttachPin(IN_1_G, pwmChannel_MG_1);
+    ledcSetup(pwmChannel_MG_2, freq, resolution);
+    ledcAttachPin(IN_2_G, pwmChannel_MG_2);
 }
 
-void PWM(int pwmchannel, int DutyCycle, boolean Direction){
-    if (pwmchannel == pwmChannel_MD){
-        //Direction = 1 (Avancer)
+void PWM(char moteur, int DutyCycle, boolean Direction){ //Direction = 1 (Avancer)
+    DutyCycle = constrain(DutyCycle, 0, 255);
+    if (moteur == 'D'){
         if (Direction){
-            digitalWrite(IN_2_D, LOW);  //(Avancer)
-            ledcWrite(pwmChannel_MD, DutyCycle);
+            ledcWrite(pwmChannel_MD_1, 0);          //(Avancer)
+            ledcWrite(pwmChannel_MD_2, DutyCycle);
         }else{
-            digitalWrite(IN_2_D, HIGH);  //(Reculer)
-            ledcWrite(pwmChannel_MD, DutyCycle);
+            ledcWrite(pwmChannel_MD_1, DutyCycle);  //(Reculer)
+            ledcWrite(pwmChannel_MD_2, 0);
         }
     }else{
         if (Direction){
-            digitalWrite(IN_2_G, HIGH);  //(Avancer)
-            ledcWrite(pwmChannel_MG, DutyCycle);
+            ledcWrite(pwmChannel_MG_1, DutyCycle);  //(Avancer)
+            ledcWrite(pwmChannel_MG_2, 0);
         }else{
-            digitalWrite(IN_2_G, LOW);  //(Reculer)
-            ledcWrite(pwmChannel_MG, DutyCycle);
+            ledcWrite(pwmChannel_MG_1, 0);          //(Reculer)
+            ledcWrite(pwmChannel_MG_2, DutyCycle);
         }
     }
 }
 
 void DEBUG_pwm(void){
-    PWM(pwmChannel_MD,100,true);
-    PWM(pwmChannel_MG,100,true);
+    PWM('D',255,true);
+    PWM('G',255,true);
     delay(500);
-    PWM(pwmChannel_MD,100,false);
-    PWM(pwmChannel_MG,100,false);
+    PWM('D',255,false);
+    PWM('G',255,false);
     delay(500);
-    PWM(pwmChannel_MD,255,true);
-    PWM(pwmChannel_MG,255,false);
 }
 
 void IRAM_ATTR ENC_ISIR_D() {
@@ -113,12 +121,24 @@ void DEBUG_encodeur(void){
 const char* ssid = "DrawBOT";
 const char* password = "DrawBOT1234";
 WebServer server(80); //port 80 
+bool joystickConnecte = false;
 
 
-void handleRoot() {
+void handleRoot(void) {
     server.send(200, "text/html", htmlPage);
 }
 
+unsigned long lastJoystickTime = 0;
+void handleJoystick(void) {
+    Joy_X = server.arg("x").toInt(); 
+    Joy_Y = server.arg("y").toInt();
+    joystickConnecte = true; //activations de la commande des joysticks
+    lastJoystickTime = millis();
+    Serial.printf("Joystick (entiers) : X=%d, Y=%d\n", Joy_X, Joy_Y);
+    server.send(200, "text/plain", "OK");
+}
+
+int Joy_X, Joy_Y;
 void Enable_wifi(void){
     // Définir l'IP statique pour le point d'accès
     IPAddress local_IP(192, 168, 14, 14);     // nouvelle IP
@@ -134,14 +154,7 @@ void Enable_wifi(void){
 
     // Configurer le serveur web
     server.on("/", handleRoot); //page principale 
-
-    server.on("/joy", HTTP_GET, []() { //retour valeurs
-        int x = server.arg("x").toInt(); 
-        int y = server.arg("y").toInt();
-        Serial.printf("Joystick (entiers) : X=%d, Y=%d\n", x, y);
-        server.send(200, "text/plain", "OK");
-    });
-
+    server.on("/joy", handleJoystick); //page joystick
 
     server.begin();
     Serial.println("Serveur HTTP lancé.");

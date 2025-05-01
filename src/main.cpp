@@ -17,11 +17,36 @@ void setup() {
   Enable_wifi();
 }
 
-int YY;
 void loop() {
-  server.handleClient(); //wifi
-  // PWM(pwmChannel_MD,YY,true);
-  // PWM(pwmChannel_MG,YY,true);
+  server.handleClient(); //rafraichissement handler (server wifi)
+
+  //Désactiver les moteurs si plus de commande depuis 2 sec
+  if (joystickConnecte && millis() - lastJoystickTime > 2000) {
+    joystickConnecte = false;
+    Disable_moteur();
+  }
+  
+  if (joystickConnecte) {
+    if (abs(Joy_Y) < 20) {
+      Disable_moteur();
+    }
+    else if (Joy_Y < 0) {
+      // reculer
+      Enable_moteur();
+      PWM('D', abs(Joy_Y), true);
+      PWM('G', abs(Joy_Y), true);
+    }
+    else {
+      // avancer
+      Enable_moteur();
+      Serial.print("else");
+      PWM('D', abs(Joy_Y), false);
+      PWM('G', abs(Joy_Y), false);
+    }
+  }  
+
+  
+  
 
   if(DEBUG){
     //DEBUG_Blink();

@@ -16,8 +16,10 @@
 // Commande PWM moteur gauche
 #define IN_1_G 17
 #define IN_2_G 16             // direction
-const int pwmChannel_MD = 0;  // canal PWM pour ESP32
-const int pwmChannel_MG = 1;  // canal PWM pour ESP32
+const int pwmChannel_MD_1 = 0;  // canal PWM pour ESP32
+const int pwmChannel_MD_2 = 1;  // canal PWM pour ESP32
+const int pwmChannel_MG_1 = 2;  // canal PWM pour ESP32
+const int pwmChannel_MG_2 = 3;  // canal PWM pour ESP32
 const int freq = 1000;        // fréquence PWM en Hz
 const int resolution = 8;     // résolution 8 bits (0-255)
 
@@ -37,24 +39,28 @@ extern long nb_tic_encodeur_G;
 #define ADDR_IMU 0x6B
 #define ADDR_MAG 0x1E
 
-
+//Wifi - server
+#include<WiFi.h>
+#include <WebServer.h>
+extern WebServer server;
+extern String htmlPage;
+extern int Joy_X, Joy_Y; //sortie du joystick
+extern bool joystickConnecte;
+extern unsigned long lastJoystickTime;
 
 #include <foundation.h>
 void DEBUG_Blink(void);
 void Enable_moteur(void);
+void Disable_moteur(void);
 void Enable_PWM(void);
-void PWM(int pwmchannel, int DutyCycle, boolean Direction);
+void PWM(char moteur, int DutyCycle, boolean Direction);
 void DEBUG_pwm(void);
 void IRAM_ATTR ENC_ISIR_D();
 void IRAM_ATTR ENC_ISIR_G();
 void Enable_encodeur(void);
 void DEBUG_encodeur(void);
-
-#include<WiFi.h>
-#include <WebServer.h>
-extern WebServer server;
-extern String htmlPage;
-
+void handleRoot(void);
+void handleJoystick(void);
 void Enable_wifi(void);
 
-extern int YY;
+
