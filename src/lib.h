@@ -5,17 +5,17 @@
 #define LEDU1 25
 #define LEDU2 26
 
+//moteurs
+#define LOWEST_PWM 20
 // Enable moteurs droit et gauche
 #define EN_D 23
 #define EN_G 4
-
 // Commande PWM moteur droit
 #define IN_1_D 19
-#define IN_2_D 18             // direction
-
+#define IN_2_D 18            
 // Commande PWM moteur gauche
 #define IN_1_G 17
-#define IN_2_G 16             // direction
+#define IN_2_G 16            
 const int pwmChannel_MD_1 = 0;  // canal PWM pour ESP32
 const int pwmChannel_MD_2 = 1;  // canal PWM pour ESP32
 const int pwmChannel_MG_1 = 2;  // canal PWM pour ESP32
@@ -42,6 +42,7 @@ extern long nb_tic_encodeur_G;
 //Wifi - server
 #include<WiFi.h>
 #include <WebServer.h>
+#define SPLEEP_TIME 500
 extern WebServer server;
 extern String htmlPage;
 extern int Joy_X, Joy_Y; //sortie du joystick
