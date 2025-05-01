@@ -63,5 +63,6 @@ void DEBUG_encodeur(void);
 void handleRoot(void);
 void handleJoystick(void);
 void Enable_wifi(void);
+void Remote (void);
 
 
