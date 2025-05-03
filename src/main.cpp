@@ -14,20 +14,23 @@ void setup() {
   //Wifi
   Enable_wifi();
   //I2C 
-  //Wire.begin(SDA,SCL);
+  Wire.begin(SDA,SCL);
   //IMU
   Enable_IMU();
+  //Magneto
+  Enable_MAG();
 }
 
 void loop() {
   server.handleClient(); //rafraichissement handler (server wifi)
   Remote();
   
-  
   if(DEBUG){
+    Enable_Teleplot();
     //DEBUG_Blink();
     //DEBUG_pwm();
-    //DEBUG_encodeur();
+    DEBUG_encodeur();
     DEBUG_IMU();
+    DEBUG_MAG();
   }
 }

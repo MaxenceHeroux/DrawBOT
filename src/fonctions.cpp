@@ -111,11 +111,11 @@ void Enable_encodeur(void){
 }
 
 void DEBUG_encodeur(void){
-    Serial.print("Ticks avec sens :   G:");
-    Serial.print(nb_tic_encodeur_G);
-    Serial.print("   D:");
+    Serial.print(">Ticks_G:");
+    Serial.println(nb_tic_encodeur_G);
+    Serial.print(">Ticks_D:");
     Serial.println(nb_tic_encodeur_D);
-    delay(500);
+    delay(100);
 }
 
 const char* ssid = "DrawBOT";
@@ -202,26 +202,31 @@ void Remote (void){
   }
 }
 
+float  i =0;
+void Enable_Teleplot(void){
+    // Print log (teleplot)
+    i += 0.1;
+    Serial.print("loop:");
+    Serial.println(i);
+}
+
 LSM6DS3 myIMU;
 void Enable_IMU (void){
     delay(1000); //relax...
     if (myIMU.begin() != 0) {
         Serial.println("Erreur : LSM6DS3 non détecté !");
     } else {
-        Serial.println("LSM6DS3 initialisé avec succès !");
+        Serial.println("Initialize LSM6DS3!");
     }
 }
 
-float  i =0;
 void DEBUG_IMU (void){
-    // Print log (teleplot)
-    i += 0.1;
-    Serial.print("loop:");
-    Serial.println(i);
+    /*gyro = vitesse angulaire
+    Accelerometre = poids graviationnel sur les axes X, Y et Z*/
 
     // Accéléromètre
     Serial.print(">Accel_X:");
-    Serial.println(myIMU.readFloatAccelX()); //gyro et gyro = accel ?  
+    Serial.println(myIMU.readFloatAccelX()); 
 
     Serial.print(">Accel_Y:");
     Serial.println(myIMU.readFloatAccelY());
@@ -246,6 +251,26 @@ void DEBUG_IMU (void){
     delay(50);
 }
 
+LIS3MDL mag;
 void Enable_MAG (void){
+    if (!mag.init())
+    {
+      Serial.println("Erreur : magnetometer non détecté !");
+      while (1);
+    }else{
+        Serial.println("Initialize magnetometer!");
+    }
+  
+    mag.enableDefault();
+}
 
+void DEBUG_MAG(void){
+    mag.read();
+    Serial.print(">MagX:");
+    Serial.println(mag.m.x);    // Affiche mag X
+    Serial.print(">MagY:");
+    Serial.println(mag.m.y);    // Affiche mag Y
+    Serial.print(">MagZ:");
+    Serial.println(mag.m.z);    // Affiche mag Z
+    delay(50);
 }

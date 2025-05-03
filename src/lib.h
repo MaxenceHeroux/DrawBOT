@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 // User led
 #define LEDU1 25
@@ -52,11 +52,13 @@ extern bool joystickConnecte;
 extern unsigned long lastJoystickTime;
 
 //IMU
-#include "SparkFunLSM6DS3.h"
+#include "SparkFunLSM6DS3.h" //todo registre = moins d espace gaspiller avec le spi ...
 extern LSM6DS3 myIMU;
 
+//Magneto
+#include <LIS3MDL.h>
+extern LIS3MDL mag;
 
-#include <foundation.h>
 void DEBUG_Blink(void);
 void Enable_moteur(void);
 void Disable_moteur(void);
@@ -71,8 +73,11 @@ void handleRoot(void);
 void handleJoystick(void);
 void Enable_wifi(void);
 void Remote (void);
+void Enable_Teleplot(void);
 void Enable_IMU (void);
 void DEBUG_IMU (void);
+void Enable_MAG (void);
+void DEBUG_MAG(void);
 
 
 
