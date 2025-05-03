@@ -125,7 +125,7 @@ bool joystickConnecte = false;
 
 
 void handleRoot(void) {
-    server.send(200, "text/html", htmlPage);
+    server.send(200, "text/html; charset=UTF-8", htmlPage);
 }
 
 unsigned long lastJoystickTime = 0;
@@ -137,6 +137,9 @@ void handleJoystick(void) {
     Serial.printf("Joystick (entiers) : X=%d, Y=%d\n", Joy_X, Joy_Y);
     server.send(200, "text/plain", "OK");
 }
+
+//todo 
+//void handleButton(void){}
 
 int Joy_X, Joy_Y;
 void Enable_wifi(void){
@@ -153,8 +156,14 @@ void Enable_wifi(void){
     Serial.println(WiFi.softAPIP());  //192.168.14.14
 
     // Configurer le serveur web
-    server.on("/", handleRoot); //page principale 
-    server.on("/joy", handleJoystick); //page joystick
+    server.on("/", handleRoot);             //page principale 
+    server.on("/joy", handleJoystick);      //page joystick
+    server.on("/favicon.ico", []() {        // Évite les erreurs
+        server.send(204); 
+    });
+    server.onNotFound([]() {                // Catch-all pour toutes autres routes
+        server.send(404, "text/plain", "Not found");
+    });
 
     server.begin();
     Serial.println("Serveur HTTP lancé.");
