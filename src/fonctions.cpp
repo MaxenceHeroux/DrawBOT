@@ -115,7 +115,6 @@ void DEBUG_encodeur(void){
     Serial.println(nb_tic_encodeur_G);
     Serial.print(">Ticks_D:");
     Serial.println(nb_tic_encodeur_D);
-    delay(100);
 }
 
 const char* ssid = "DrawBOT";
@@ -141,8 +140,7 @@ void handleJoystick(void) {
     server.send(200, "text/plain", "OK");
 }
 
-//todo 
-//void handleButton(void){}
+//TODO void handleButton(void){}
 
 int Joy_X, Joy_Y;
 void Enable_wifi(void){
@@ -247,12 +245,10 @@ void DEBUG_IMU (void){
     // Température
     Serial.print(">Temp_C:");
     Serial.println(myIMU.readTempC());
-
-    delay(50);
 }
 
 LIS3MDL mag;
-void Enable_MAG (void){
+void Enable_MAG (void){  //calibration : min: { -4750,  -2345,  -1612}   max: {  -773,  +2753,  +3158}
     if (!mag.init())
     {
       Serial.println("Erreur : magnetometer non détecté !");
@@ -272,5 +268,16 @@ void DEBUG_MAG(void){
     Serial.println(mag.m.y);    // Affiche mag Y
     Serial.print(">MagZ:");
     Serial.println(mag.m.z);    // Affiche mag Z
-    delay(50);
+}
+
+float Find_north (void){ //TODO calibration 
+    mag.read();
+    float heading = atan2(mag.m.y, -mag.m.x) * 180 / PI;
+    if (heading < 0) heading += 360;
+    return heading;
+}
+
+void DEBUG_North (void){ //FIXME north programme
+    Serial.print(">North:");
+    Serial.println(Find_north());
 }

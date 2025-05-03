@@ -57,6 +57,10 @@ extern LSM6DS3 myIMU;
 
 //Magneto
 #include <LIS3MDL.h>
+#define CALIBRATION_MAG_X (-773 - 4750)/2
+#define CALIBRATION_MAG_Y (2753 - 2345)/2
+#define CALIBRATION_MAG_Z (3158 - 1612)/2
+
 extern LIS3MDL mag;
 
 void DEBUG_Blink(void);
@@ -78,6 +82,8 @@ void Enable_IMU (void);
 void DEBUG_IMU (void);
 void Enable_MAG (void);
 void DEBUG_MAG(void);
+float Find_north (void);
+void DEBUG_North (void);
 
 
 

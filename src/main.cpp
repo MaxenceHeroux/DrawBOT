@@ -21,6 +21,7 @@ void setup() {
   Enable_MAG();
 }
 
+
 void loop() {
   server.handleClient(); //rafraichissement handler (server wifi)
   Remote();
@@ -29,8 +30,9 @@ void loop() {
     Enable_Teleplot();
     //DEBUG_Blink();
     //DEBUG_pwm();
-    DEBUG_encodeur();
-    DEBUG_IMU();
-    DEBUG_MAG();
+    DEBUG_encodeur(); //Teleplot
+    DEBUG_IMU();      //Teleplot
+    DEBUG_MAG();      //Teleplot
+    DEBUG_North();    //Teleplot
   }
 }
