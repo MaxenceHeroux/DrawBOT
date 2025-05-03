@@ -1,4 +1,5 @@
 #include <Arduino.h>
+
 #define DEBUG 0
 
 // User led
@@ -32,10 +33,11 @@ extern long nb_tic_encodeur_D;
 #define ENC_G_CH_B 33
 extern long nb_tic_encodeur_G;
 
+
 // I2C
+#include <Wire.h>
 #define SDA 21
 #define SCL 22
-// Adresse I2C
 #define ADDR_IMU 0x6B
 #define ADDR_MAG 0x1E
 
@@ -48,6 +50,11 @@ extern String htmlPage;
 extern int Joy_X, Joy_Y; //sortie du joystick
 extern bool joystickConnecte;
 extern unsigned long lastJoystickTime;
+
+//IMU
+#include "SparkFunLSM6DS3.h"
+extern LSM6DS3 myIMU;
+
 
 #include <foundation.h>
 void DEBUG_Blink(void);
@@ -64,5 +71,8 @@ void handleRoot(void);
 void handleJoystick(void);
 void Enable_wifi(void);
 void Remote (void);
+void Enable_IMU (void);
+void DEBUG_IMU (void);
+
 
 

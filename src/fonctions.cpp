@@ -134,7 +134,10 @@ void handleJoystick(void) {
     Joy_Y = server.arg("y").toInt();
     joystickConnecte = true; //activations de la commande des joysticks
     lastJoystickTime = millis();
-    Serial.printf("Joystick (entiers) : X=%d, Y=%d\n", Joy_X, Joy_Y);
+    //DEBUG
+    if(DEBUG){
+        Serial.printf("Joystick (entiers) : X=%d, Y=%d\n", Joy_X, Joy_Y);
+    }
     server.send(200, "text/plain", "OK");
 }
 
@@ -197,4 +200,52 @@ void Remote (void){
     if (Vd > 0) PWM('D', Vd, false);   // avancer
     else        PWM('D', -Vd, true);   // reculer
   }
+}
+
+LSM6DS3 myIMU;
+void Enable_IMU (void){
+    delay(1000); //relax...
+    if (myIMU.begin() != 0) {
+        Serial.println("Erreur : LSM6DS3 non détecté !");
+    } else {
+        Serial.println("LSM6DS3 initialisé avec succès !");
+    }
+}
+
+float  i =0;
+void DEBUG_IMU (void){
+    // Print log (teleplot)
+    i += 0.1;
+    Serial.print("loop:");
+    Serial.println(i);
+
+    // Accéléromètre
+    Serial.print(">Accel_X:");
+    Serial.println(myIMU.readFloatAccelX()); //gyro et gyro = accel ?  
+
+    Serial.print(">Accel_Y:");
+    Serial.println(myIMU.readFloatAccelY());
+
+    Serial.print(">Accel_Z:");
+    Serial.println(myIMU.readFloatAccelZ());
+
+    // Gyroscope
+    Serial.print(">Gyro_X:");
+    Serial.println(myIMU.readFloatGyroX());
+
+    Serial.print(">Gyro_Y:");
+    Serial.println(myIMU.readFloatGyroY());
+
+    Serial.print(">Gyro_Z:");
+    Serial.println(myIMU.readFloatGyroZ());
+
+    // Température
+    Serial.print(">Temp_C:");
+    Serial.println(myIMU.readTempC());
+
+    delay(50);
+}
+
+void Enable_MAG (void){
+
 }
