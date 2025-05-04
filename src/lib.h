@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 // User led
 #define LEDU1 25
@@ -23,16 +23,21 @@ const int pwmChannel_MG_1 = 2;  // canal PWM pour ESP32
 const int pwmChannel_MG_2 = 3;  // canal PWM pour ESP32
 const int freq = 1000;        // fréquence PWM en Hz
 const int resolution = 8;     // résolution 8 bits (0-255)
+extern int commande_MD, commande_MG;
+extern int consigne_MD, consigne_MG;
 
+//Encodeurs
+#define COEFF_MOTEUR 0.66 // ~255/350 // commande pwm 255 = 255 tour de roue par mini boucle, objectif : exprimer les tiques en proportion du pwm 255 -> 350 ticks X->, permet le calcul de l'erreur et le pid sans faire (pwm = cb de ticks et apres erreur puis re pwm pour le pid)
 // Encodeur droit
 #define ENC_D_CH_A 27
 #define ENC_D_CH_B 14
 extern long nb_tic_encodeur_D;
+extern long nb_tic_encodeur_D_prec;
 // Encodeur gauche
 #define ENC_G_CH_A 32
 #define ENC_G_CH_B 33
 extern long nb_tic_encodeur_G;
-
+extern long nb_tic_encodeur_G_prec;
 
 // I2C
 #include <Wire.h>
@@ -60,14 +65,14 @@ extern LSM6DS3 myIMU;
 #define CALIBRATION_MAG_X (-773 - 4750)/2
 #define CALIBRATION_MAG_Y (2753 - 2345)/2
 #define CALIBRATION_MAG_Z (3158 - 1612)/2
-
 extern LIS3MDL mag;
 
+//fonctions.cpp
 void DEBUG_Blink(void);
 void Enable_moteur(void);
 void Disable_moteur(void);
 void Enable_PWM(void);
-void PWM(char moteur, int DutyCycle, boolean Direction);
+void PWM(char moteur, int DutyCycle);
 void DEBUG_pwm(void);
 void IRAM_ATTR ENC_ISIR_D();
 void IRAM_ATTR ENC_ISIR_G();
@@ -85,5 +90,9 @@ void DEBUG_MAG(void);
 float Find_north (void);
 void DEBUG_North (void);
 
+//Asservissement.cpp
+int Mini_boucle (void);
+void ENC_vitesse (void);
+void PID (float KP, float KI, float KD);
 
 

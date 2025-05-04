@@ -43,33 +43,37 @@ void Enable_PWM(void){
     ledcAttachPin(IN_2_G, pwmChannel_MG_2);
 }
 
-void PWM(char moteur, int DutyCycle, boolean Direction){ //Direction = 1 (Avancer)
-    DutyCycle = constrain(DutyCycle, 0, 255);
+void PWM(char moteur, int DutyCycle){ //pwm >0 = avancer
+    boolean Direction = true; 
+    DutyCycle = constrain(DutyCycle, -255, 255);
+    if (DutyCycle <0) { //si pwm negatif alors inversion de la direction 
+        Direction = ! Direction;
+    }
     if (moteur == 'D'){
         if (Direction){
-            ledcWrite(pwmChannel_MD_1, 0);          //(Avancer)
-            ledcWrite(pwmChannel_MD_2, DutyCycle);
+            ledcWrite(pwmChannel_MD_1, 0);                  //(Avancer)
+            ledcWrite(pwmChannel_MD_2, abs(DutyCycle));
         }else{
-            ledcWrite(pwmChannel_MD_1, DutyCycle);  //(Reculer)
+            ledcWrite(pwmChannel_MD_1, abs(DutyCycle));     //(Reculer)
             ledcWrite(pwmChannel_MD_2, 0);
         }
     }else{
         if (Direction){
-            ledcWrite(pwmChannel_MG_1, DutyCycle);  //(Avancer)
+            ledcWrite(pwmChannel_MG_1, abs(DutyCycle));     //(Avancer)
             ledcWrite(pwmChannel_MG_2, 0);
         }else{
-            ledcWrite(pwmChannel_MG_1, 0);          //(Reculer)
-            ledcWrite(pwmChannel_MG_2, DutyCycle);
+            ledcWrite(pwmChannel_MG_1, 0);                  //(Reculer)
+            ledcWrite(pwmChannel_MG_2, abs(DutyCycle));
         }
     }
 }
 
 void DEBUG_pwm(void){
-    PWM('D',255,true);
-    PWM('G',255,true);
+    PWM('D',255);
+    PWM('G',255);
     delay(500);
-    PWM('D',255,false);
-    PWM('G',255,false);
+    PWM('D',-255);
+    PWM('G',-255);
     delay(500);
 }
 
@@ -106,6 +110,8 @@ void Enable_encodeur(void){
     pinMode(ENC_G_CH_B, INPUT_PULLUP);
     nb_tic_encodeur_D =0;
     nb_tic_encodeur_G =0;
+    nb_tic_encodeur_D_prec =0;
+    nb_tic_encodeur_G_prec =0;
     attachInterrupt(digitalPinToInterrupt(ENC_D_CH_A), ENC_ISIR_D, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC_G_CH_A), ENC_ISIR_G, CHANGE);
 }
@@ -191,12 +197,9 @@ void Remote (void){
     Vd = constrain(Joy_Y + Joy_X, -255, 255);
 
     // Moteur gauche
-    if (Vg > 0) PWM('G', Vg, false);   // avancer
-    else        PWM('G', -Vg, true);   // reculer
-
+    PWM('G', Vg);   
     // Moteur droit
-    if (Vd > 0) PWM('D', Vd, false);   // avancer
-    else        PWM('D', -Vd, true);   // reculer
+    PWM('D', Vd);
   }
 }
 
