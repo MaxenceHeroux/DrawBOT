@@ -47,7 +47,7 @@ void PID (float KP, float KI, float KD){
     commande_MD = KP * erreur_D + KI * Integrale_erreur_D + KD * Derive_erreur_D;                   //PID
     erreur_D_prec = erreur_D;
 
-    erreur_G = consigne_MD - dG;                                                                    //calcul de l'erreur
+    erreur_G = consigne_MG - dG;                                                                    //calcul de l'erreur
     Integrale_erreur_G +=  erreur_G;                                                                //Integrale
     Derive_erreur_G = -(dG - erreur_G_prec);                                                        //Derivée
     commande_MG = KP * erreur_G + KI * Integrale_erreur_G + KD * Derive_erreur_G;                   //PID

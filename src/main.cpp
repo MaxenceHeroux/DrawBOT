@@ -31,7 +31,7 @@ void loop() {
 
   Enable_Teleplot();
 
-  consigne_MD =100;
+  consigne_MD =200;
   consigne_MG =100;
 
   Serial.print(">Commande_moteur_attendu:");
