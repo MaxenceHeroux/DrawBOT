@@ -1,21 +1,22 @@
-<!-- ecrire le HTML ICI : -->
-
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Joystick ESP32</title>
+  <title>Joystick ESP32 + Contrôle PID</title>
   <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+    }
     #joystickZone {
       width: 400px;
       height: 400px;
       background: #eee;
       border-radius: 50%;
       position: relative;
-      margin: 50px auto;
+      margin: 20px auto;
       touch-action: none;
     }
-
     #stick {
       width: 100px;
       height: 100px;
@@ -25,23 +26,44 @@
       top: 150px;
       left: 150px;
     }
-
     #values {
-      text-align: center;
-      font-family: sans-serif;
       font-size: 1.4em;
+      margin-bottom: 20px;
+    }
+    .param {
+      margin: 10px;
+    }
+    .button-sequence {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 1em;
     }
   </style>
 </head>
 <body>
-  <h1 style="text-align:center;">ESP32 - DrawBOT</h1>
+  <h1>ESP32 - DrawBOT</h1>
+
   <div id="joystickZone">
     <div id="stick"></div>
   </div>
+
   <div id="values">
     X: <span id="xVal">0</span> |
     Y: <span id="yVal">0</span>
   </div>
+
+  <h2>Contrôle PID</h2>
+  <div>
+    <label class="param">KP: <input type="number" id="kp" step="0.1" value="1.0"></label>
+    <label class="param">KI: <input type="number" id="ki" step="0.1" value="0.0"></label>
+    <label class="param">KD: <input type="number" id="kd" step="0.1" value="0.0"></label>
+    <button onclick="sendPID()">Envoyer PID</button>
+  </div>
+
+  <h2>Séquences DrawBOT</h2>
+  <button class="button-sequence" onclick="sendSequence('rotate')">Rotation 90°</button>
+  <button class="button-sequence" onclick="sendSequence('line')">Avancer en ligne droite</button>
+  <button class="button-sequence" onclick="sendSequence('step')">Tracer un escalier</button>
 
   <script>
     const zone = document.getElementById("joystickZone");
@@ -51,7 +73,7 @@
 
     let centerX = zone.offsetWidth / 2;
     let centerY = zone.offsetHeight / 2;
-    let maxRange = 150; // joystick étendu : rayon max logique
+    let maxRange = 150;
 
     zone.addEventListener("touchmove", function(event) {
       event.preventDefault();
@@ -69,14 +91,12 @@
       stick.style.left = (x + centerX - 50) + "px";
       stick.style.top = (y + centerY - 50) + "px";
 
-      // Conversion de -maxRange..+maxRange en -255..+255
       let mappedX = Math.round((x / maxRange) * 255);
       let mappedY = Math.round((y / maxRange) * 255);
 
       xVal.innerText = mappedX;
       yVal.innerText = mappedY;
 
-      // Envoi vers ESP32
       fetch(`/joy?x=${mappedX}&y=${mappedY}`).catch(e => {});
     });
 
@@ -87,9 +107,17 @@
       yVal.innerText = 0;
       fetch(`/joy?x=0&y=0`).catch(e => {});
     });
-  
+
+    function sendPID() {
+      const kp = document.getElementById("kp").value;
+      const ki = document.getElementById("ki").value;
+      const kd = document.getElementById("kd").value;
+      fetch(`/pid?kp=${kp}&ki=${ki}&kd=${kd}`).catch(e => {});
+    }
+
+    function sendSequence(seq) {
+      fetch(`/sequence?type=${seq}`).catch(e => {});
+    }
   </script>
-  </body>
-  </html>
-  <!-- Fin du HTML-->
-  
+</body>
+</html>

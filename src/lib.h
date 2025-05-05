@@ -86,6 +86,8 @@ void Remote (void);
 void Enable_Teleplot(void);
 void Enable_IMU (void);
 void DEBUG_IMU (void);
+float Find_angle (void);
+void DEBUG_angle(void);
 void Enable_MAG (void);
 void DEBUG_MAG(void);
 float Find_north (void);
