@@ -245,25 +245,32 @@ void DEBUG_IMU (void){
     Serial.print(">Gyro_Z:");
     Serial.println(myIMU.readFloatGyroZ());
 
-    // Lire la vitesse de rotation autour de l'axe Z (en degrés par seconde)
-    float vitesse_Z = myIMU.readFloatGyroZ();
-
-    // Calcul du temps écoulé depuis la dernière mesure (en secondes)
-    unsigned long temps_actuel = millis();
-    float duree = (temps_actuel - temps_precedent) / 1000.0;
-    temps_precedent = temps_actuel;
-
-    // Intégration : angle = angle + (vitesse × durée)
-    angle_total_Z = angle_total_Z + vitesse_Z * duree;
-
-    // Affichage dans Teleplot
-    Serial.print(">AngleZ:");
-    Serial.println(angle_total_Z);
-
-
     // Température
     Serial.print(">Temp_C:");
     Serial.println(myIMU.readTempC());
+}
+
+float Find_angle (void){
+    float vitesse_Z = myIMU.readFloatGyroZ();
+    if (abs(vitesse_Z) < 3.5) vitesse_Z = 0; // Filtrage du bruit (dead zone = 3)
+
+    unsigned long temps_actuel = millis();
+    float duree = (temps_actuel - temps_precedent) / 1000.0; //sec
+    temps_precedent = temps_actuel;
+
+    angle_total_Z += vitesse_Z * duree; //integrale de la vitesse angulaire cumulée
+
+    // // Normaliser l'angle entre 0° et 360°
+    // angle_total_Z = fmod(angle_total_Z, 360.0);
+    // if (angle_total_Z < 0) angle_total_Z += 360.0;
+
+    return angle_total_Z;
+    
+}
+
+void DEBUG_angle(void){
+    Serial.print(">AngleZ:");
+    Serial.println(Find_angle());
 }
 
 LIS3MDL mag;
