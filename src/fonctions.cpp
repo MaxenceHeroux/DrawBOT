@@ -201,6 +201,9 @@ void Remote (void){
 }
 
 float  i =0;
+float angle_total_Z = 0;              // Angle cumulé en degrés
+unsigned long temps_precedent = 0;    // Temps de la dernière mesure
+
 void Enable_Teleplot(void){
     // Print log (teleplot)
     i += 0.1;
@@ -241,6 +244,22 @@ void DEBUG_IMU (void){
 
     Serial.print(">Gyro_Z:");
     Serial.println(myIMU.readFloatGyroZ());
+
+    // Lire la vitesse de rotation autour de l'axe Z (en degrés par seconde)
+    float vitesse_Z = myIMU.readFloatGyroZ();
+
+    // Calcul du temps écoulé depuis la dernière mesure (en secondes)
+    unsigned long temps_actuel = millis();
+    float duree = (temps_actuel - temps_precedent) / 1000.0;
+    temps_precedent = temps_actuel;
+
+    // Intégration : angle = angle + (vitesse × durée)
+    angle_total_Z = angle_total_Z + vitesse_Z * duree;
+
+    // Affichage dans Teleplot
+    Serial.print(">AngleZ:");
+    Serial.println(angle_total_Z);
+
 
     // Température
     Serial.print(">Temp_C:");
