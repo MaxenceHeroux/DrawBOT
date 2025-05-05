@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 // User led
 #define LEDU1 25
@@ -25,6 +25,7 @@ const int freq = 1000;        // fréquence PWM en Hz
 const int resolution = 8;     // résolution 8 bits (0-255)
 extern int commande_MD, commande_MG;
 extern int consigne_MD, consigne_MG;
+extern int commande_ticks_MD, commande_ticks_MG;
 
 //Encodeurs
 #define COEFF_MOTEUR 0.66 // ~255/350 // commande pwm 255 = 255 tour de roue par mini boucle, objectif : exprimer les tiques en proportion du pwm 255 -> 350 ticks X->, permet le calcul de l'erreur et le pid sans faire (pwm = cb de ticks et apres erreur puis re pwm pour le pid)
@@ -93,6 +94,6 @@ void DEBUG_North (void);
 //Asservissement.cpp
 int Mini_boucle (void);
 void ENC_vitesse (void);
-void PID (float KP, float KI, float KD);
-
+void PID_vitesse (float KP, float KI, float KD);
+void PID_distance (float KP, float KI, float KD);
 

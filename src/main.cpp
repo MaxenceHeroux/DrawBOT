@@ -21,9 +21,9 @@ void setup() {
   Enable_MAG();
 }
 
-
 int commande_MD =0, commande_MG =0;
 int consigne_MD =0, consigne_MG =0;
+int commande_ticks_MD =0, commande_ticks_MG =0;
 
 void loop() {
   server.handleClient(); //rafraichissement handler (server wifi)
@@ -31,7 +31,7 @@ void loop() {
 
   Enable_Teleplot();
 
-  consigne_MD =200;
+  consigne_MD =100;
   consigne_MG =100;
 
   Serial.print(">Commande_moteur_attendu:");
@@ -39,8 +39,17 @@ void loop() {
 
   if (Mini_boucle()){ //calcul des vitesses avant le PID
     ENC_vitesse();
-    PID(1.1,0.001,-0.5); //TODO PID a regeler avec le poids du robot (pour l instant regler a vide)
+    PID_vitesse(1.1,0.001,-0.5); //TODO PID a regeler avec le poids du robot (pour l instant regler a vide)
   }  
+
+  // consigne_MD =1000; //en ticks
+  // Serial.print(">Commande_ticks_attendu:");
+  // Serial.println(commande_ticks_MD);
+
+  // Serial.print(">Commande_moteur:");
+  // Serial.println(commande_MD);
+
+  // PID_distance(1,0,0);
 
   PWM('D',commande_MD);
   PWM('G',commande_MG);  

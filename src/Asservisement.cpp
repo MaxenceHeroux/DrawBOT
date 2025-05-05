@@ -40,7 +40,7 @@ int erreur_G =0, erreur_G_prec =0;
 int Integrale_erreur_G =0;
 int Derive_erreur_G =0;
 
-void PID (float KP, float KI, float KD){ 
+void PID_vitesse (float KP, float KI, float KD){ 
     erreur_D = consigne_MD - dD;                                                                    //calcul de l'erreur
     Integrale_erreur_D +=  erreur_D;                                                                //Integrale
     Derive_erreur_D = -(dD - erreur_D_prec); // Dérivée sur la mesure != erreur_D - erreur_D_prec;  //Derivée
@@ -55,6 +55,18 @@ void PID (float KP, float KI, float KD){
 
     commande_MD = constrain(commande_MD, -255, 255);
     commande_MG = constrain(commande_MG, -255, 255);
+}
+
+void PID_distance (float KP, float KI, float KD){
+    erreur_D = consigne_MD - nb_tic_encodeur_D;                                                                    
+    Integrale_erreur_D +=  erreur_D;                                                             
+    Derive_erreur_D = erreur_D - erreur_D_prec;  
+    commande_ticks_MD = KP * erreur_D + KI * Integrale_erreur_D + KD * Derive_erreur_D;                   
+    erreur_D_prec = erreur_D;
+
+    if (commande_ticks_MD > 355) commande_MD =255;
+    else commande_MD = map(commande_MD,0,355,20,255);//map
+    commande_MD = constrain(commande_MD, -255, 255);
 }
 
 
