@@ -4,7 +4,7 @@
   Variable utile : nb_tic_encodeur_D nb_tic_encodeur_G 
   Fonction utile : PWM () //TODO Get orientation_by_IMU () Findnorth() EKF()
 --------------------------------------------------------------------------------*/ 
-
+/*
 int previousMillis =0;
 
 int Mini_boucle (void){
@@ -33,12 +33,7 @@ void ENC_vitesse (void){
     Serial.println(dG);
 }
 
-int erreur_D =0, erreur_D_prec =0;
-int Integrale_erreur_D =0;
-int Derive_erreur_D =0;
-int erreur_G =0, erreur_G_prec =0;
-int Integrale_erreur_G =0;
-int Derive_erreur_G =0;
+
 
 void PID_vitesse (float KP, float KI, float KD){ 
     erreur_D = consigne_MD - dD;                                                                    //calcul de l'erreur
@@ -55,9 +50,31 @@ void PID_vitesse (float KP, float KI, float KD){
 
     commande_MD = constrain(commande_MD, -255, 255);
     commande_MG = constrain(commande_MG, -255, 255);
+
+    //main 
+    // consigne_MD =100;
+    // consigne_MG =100;
+
+    // Serial.print(">Commande_moteur_attendu:");
+    // Serial.println(consigne_MD);
+
+    // if (Mini_boucle()){ //calcul des vitesses avant le PID
+    //   ENC_vitesse();
+    //   PID_vitesse(1.1,0.001,-0.5);
+    // }  
 }
+*/
+
+int erreur_D =0, erreur_D_prec =0;
+int Integrale_erreur_D =0;
+int Derive_erreur_D =0;
+
+int erreur_G =0, erreur_G_prec =0;
+int Integrale_erreur_G =0;
+int Derive_erreur_G =0;
 
 void PID_distance (float KP, float KI, float KD){
+    //Moteur droit
     erreur_D = consigne_MD - nb_tic_encodeur_D;                                                                    
     Integrale_erreur_D +=  erreur_D;                                                             
     Derive_erreur_D = erreur_D - erreur_D_prec;  
@@ -65,8 +82,32 @@ void PID_distance (float KP, float KI, float KD){
     erreur_D_prec = erreur_D;
 
     if (commande_ticks_MD > 355) commande_MD =255;
-    else commande_MD = map(commande_MD,0,355,20,255);//map
+    else commande_MD = map(commande_ticks_MD,0,355,20,255);//map
     commande_MD = constrain(commande_MD, -255, 255);
+
+    //moteur gauche 
+    erreur_G = consigne_MG - nb_tic_encodeur_G;                                                                    
+    Integrale_erreur_G +=  erreur_G;                                                             
+    Derive_erreur_G = erreur_G - erreur_G_prec;  
+    commande_ticks_MG = KP * erreur_G + KI * Integrale_erreur_G + KD * Derive_erreur_G;                   
+    erreur_G_prec = erreur_G;
+
+    if (commande_ticks_MG > 355) commande_MG =255;
+    else commande_MG = map(commande_ticks_MG,0,355,20,255);//map
+    commande_MG = constrain(commande_MG, -255, 255);
 }
 
+void DEBUG_PID_distance (void){
+    Serial.print(">Consigne_tic_D:");         //PID consigne
+    Serial.println(nb_tic_encodeur_D);
+
+    Serial.print(">Consigne_attendu_tic_D:"); //consigne
+    Serial.println(consigne_MD);
+
+    Serial.print(">Consigne_tic_G:");         //PID consigne
+    Serial.println(nb_tic_encodeur_G);
+
+    Serial.print(">Consigne_attendu_tic_G:"); //consigne
+    Serial.println(consigne_MG);
+}
 

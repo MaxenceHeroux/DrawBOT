@@ -29,40 +29,22 @@ void loop() {
   server.handleClient(); //rafraichissement handler (server wifi)
   Remote();
 
-  Enable_Teleplot();
+  consigne_MD =1000; //en ticks
+  consigne_MG =1000; //en ticks
 
-  consigne_MD =100;
-  consigne_MG =100;
-
-  Serial.print(">Commande_moteur_attendu:");
-  Serial.println(consigne_MD);
-
-  if (Mini_boucle()){ //calcul des vitesses avant le PID
-    ENC_vitesse();
-    PID_vitesse(1.1,0.001,-0.5); //TODO PID a regeler avec le poids du robot (pour l instant regler a vide)
-  }  
-
-  // consigne_MD =1000; //en ticks
-  // Serial.print(">Commande_ticks_attendu:");
-  // Serial.println(commande_ticks_MD);
-
-  // Serial.print(">Commande_moteur:");
-  // Serial.println(commande_MD);
-
-  // PID_distance(1,0,0);
+  PID_distance(1,0,0);
 
   PWM('D',commande_MD);
-  PWM('G',commande_MG);  
-
-  DEBUG_encodeur();   
+  PWM('G',commande_MG);    
 
   if(DEBUG){
     Enable_Teleplot();
     //DEBUG_Blink();
     //DEBUG_pwm();
-    DEBUG_encodeur(); //Teleplot
-    DEBUG_IMU();      //Teleplot
-    DEBUG_MAG();      //Teleplot
-    DEBUG_North();    //Teleplot
+    // DEBUG_encodeur();     //Teleplot
+    // DEBUG_IMU();          //Teleplot
+    // DEBUG_MAG();          //Teleplot
+    // DEBUG_North();        //Teleplot
+    DEBUG_PID_distance(); //Teleplot
   }
 }

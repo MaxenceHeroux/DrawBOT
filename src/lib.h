@@ -33,12 +33,12 @@ extern int commande_ticks_MD, commande_ticks_MG;
 #define ENC_D_CH_A 27
 #define ENC_D_CH_B 14
 extern long nb_tic_encodeur_D;
-extern long nb_tic_encodeur_D_prec;
+//extern long nb_tic_encodeur_D_prec;
 // Encodeur gauche
 #define ENC_G_CH_A 32
 #define ENC_G_CH_B 33
 extern long nb_tic_encodeur_G;
-extern long nb_tic_encodeur_G_prec;
+//extern long nb_tic_encodeur_G_prec;
 
 // I2C
 #include <Wire.h>
@@ -96,4 +96,5 @@ int Mini_boucle (void);
 void ENC_vitesse (void);
 void PID_vitesse (float KP, float KI, float KD);
 void PID_distance (float KP, float KI, float KD);
+void DEBUG_PID_distance (void);
 

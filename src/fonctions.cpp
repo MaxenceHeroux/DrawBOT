@@ -110,8 +110,8 @@ void Enable_encodeur(void){
     pinMode(ENC_G_CH_B, INPUT_PULLUP);
     nb_tic_encodeur_D =0;
     nb_tic_encodeur_G =0;
-    nb_tic_encodeur_D_prec =0;
-    nb_tic_encodeur_G_prec =0;
+    //nb_tic_encodeur_D_prec =0;
+    //nb_tic_encodeur_G_prec =0;
     attachInterrupt(digitalPinToInterrupt(ENC_D_CH_A), ENC_ISIR_D, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC_G_CH_A), ENC_ISIR_G, CHANGE);
 }
