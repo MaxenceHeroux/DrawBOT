@@ -2,10 +2,10 @@
 
 /*--------------------------------------------------------------------------------
   Variable utile : nb_tic_encodeur_D nb_tic_encodeur_G 
-  Fonction utile : PWM () //TODO Get orientation_by_IMU () Findnorth() EKF()
+  Fonction utile : PWM () Get orientation_by_IMU () Findnorth() EKF()
 --------------------------------------------------------------------------------*/ 
 /*
-int previousMillis =0;
+int previousMillis =0; //TODO PID vitesse (on a pas fait tt ca pour rien mdr !)
 
 int Mini_boucle (void){
     if( millis() - previousMillis >100) {
@@ -82,8 +82,9 @@ void PID_distance (float KP, float KI, float KD){
     erreur_D_prec = erreur_D;
 
     if (commande_ticks_MD > 355) commande_MD =255;
-    else commande_MD = map(commande_ticks_MD,0,355,20,255);//map
+    else commande_MD = map(commande_ticks_MD,0,355,LOWEST_PWM,255);//map
     commande_MD = constrain(commande_MD, -255, 255);
+    if(abs (commande_MG) <= LOWEST_PWM) commande_MD =0; //dead zone 
 
     //moteur gauche 
     erreur_G = consigne_MG - nb_tic_encodeur_G;                                                                    
@@ -93,8 +94,9 @@ void PID_distance (float KP, float KI, float KD){
     erreur_G_prec = erreur_G;
 
     if (commande_ticks_MG > 355) commande_MG =255;
-    else commande_MG = map(commande_ticks_MG,0,355,20,255);//map
+    else commande_MG = map(commande_ticks_MG,0,355,LOWEST_PWM,255);//map
     commande_MG = constrain(commande_MG, -255, 255);
+    if(abs (commande_MG) <= LOWEST_PWM) commande_MG =0; //dead zone 
 }
 
 void DEBUG_PID_distance (void){
@@ -104,10 +106,23 @@ void DEBUG_PID_distance (void){
     Serial.print(">Consigne_attendu_tic_D:"); //consigne
     Serial.println(consigne_MD);
 
+    Serial.print(">Vitesse_moteur_D:");       //vitesse Moteur
+    Serial.println(commande_MD);
+
     Serial.print(">Consigne_tic_G:");         //PID consigne
     Serial.println(nb_tic_encodeur_G);
 
     Serial.print(">Consigne_attendu_tic_G:"); //consigne
     Serial.println(consigne_MG);
+
+    Serial.print(">Vitesse_moteur_G:");       //vitesse Moteur 
+    Serial.println(commande_MG);
+}
+
+float Ticks_to_Distance (int distance){
+    float nb_de_ticks_par_roues = 2100;
+    float diametre_roue = 90;
+    float ticks = (distance / (diametre_roue * PI)) * nb_de_ticks_par_roues;
+    return ticks;
 }
 

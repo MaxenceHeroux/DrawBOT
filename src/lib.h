@@ -99,4 +99,4 @@ void ENC_vitesse (void);
 void PID_vitesse (float KP, float KI, float KD);
 void PID_distance (float KP, float KI, float KD);
 void DEBUG_PID_distance (void);
-
+float Ticks_to_Distance (int ticks);
