@@ -33,24 +33,32 @@ int commande_rot_MD =0, commande_rot_MG =0; //sortie du pid
 void loop() {
   server.handleClient(); //rafraichissement handler (server wifi)
   Remote();
+  int commande_MD, commande_MG;
 
-  // consigne_dist_MD =(int)Ticks_to_Distance(100); 
-  // consigne_dist_MG =(int)Ticks_to_Distance(100); 
+  if(millis()<10000){
+    //DISTANCE
+    consigne_dist_MD =(int)Ticks_to_Distance(100); 
+    consigne_dist_MG =(int)Ticks_to_Distance(100); 
 
-  // PID_distance(1,0,0.8); //TODO a regler pid distance 
+    PID_distance(1,0,0.8); //TODO a regler pid distance 
 
-  // int commande_MD = commande_dist_MD;
-  // int commande_MG = commande_dist_MG;
+    commande_MD = commande_dist_MD;
+    commande_MG = commande_dist_MG;
 
-  consigne_rot_MD = 760;
+    PWM('D',commande_MD);
+    PWM('G',commande_MG);
+  }else{
+    //ANGLE
+    consigne_rot_MD = 90;
 
-  PID_rotation(1.5,0,0);
+    PID_rotation(1.5,0,0);
 
-  int commande_MD = commande_rot_MD;
-  int commande_MG = commande_rot_MG;
-  
-  PWM('D',commande_MD);
-  PWM('G',commande_MG);
+    commande_MD = commande_rot_MD;
+    commande_MG = commande_rot_MG;
+    
+    PWM('D',commande_MD);
+    PWM('G',commande_MG);
+  }
 
   if(DEBUG){
     Enable_Teleplot();       //Obligatoire pour run un DEBUG Teleplot ! 
@@ -62,5 +70,6 @@ void loop() {
      DEBUG_angle();        //Teleplot
     // DEBUG_North();        //Teleplot
     //DEBUG_PID_distance();    //Teleplot
+    DEBUG_PID_angle();      //Teleplot
   }
 }

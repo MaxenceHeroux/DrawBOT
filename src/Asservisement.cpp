@@ -134,9 +134,9 @@ int Derive_erreur_rot_D =0;
 // int erreur_rot_G =0, erreur_rot_G_prec =0;
 // int Integrale_erreur_rot_G =0;
 // int Derive_erreur_rot_G =0;
+int commande_rot_deg_MD, commande_rot_deg_MG;
 
 void PID_rotation(float KP, float KI, float KD){
-    int commande_rot_deg_MD, commande_rot_deg_MG;
     //Moteur droit
     erreur_rot_D = consigne_rot_MD - Find_angle();                                                                  
     Integrale_erreur_rot_D +=  erreur_rot_D;    
@@ -154,4 +154,18 @@ void PID_rotation(float KP, float KI, float KD){
     //apliquer une roation opossé aux deux moteurs
     commande_rot_MG = commande_rot_MD;
     commande_rot_MD = -commande_rot_MD;
+}
+
+void DEBUG_PID_angle (void){
+    Serial.print(">Consigne_angle_D:");         //PID consigne
+    Serial.println(commande_rot_deg_MD);
+
+    Serial.print(">Consigne_attendu_angle_D:"); //consigne
+    Serial.println(consigne_rot_MD);
+
+    Serial.print(">Vitesse_moteur_D:");       //vitesse Moteur
+    Serial.println(commande_rot_MD);
+
+    Serial.print(">Vitesse_moteur_G:");       //vitesse Moteur 
+    Serial.println(commande_rot_MG);
 }

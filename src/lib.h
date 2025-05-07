@@ -105,3 +105,4 @@ void PID_distance (float KP, float KI, float KD);
 void DEBUG_PID_distance (void);
 float Ticks_to_Distance (int ticks);
 void PID_rotation(float KP, float KI, float KD);
+void DEBUG_PID_angle (void);
