@@ -193,8 +193,8 @@ void Remote (void){
 
     Enable_moteur();
     // Calcul des vitesses
-    Vg = constrain(Joy_Y - Joy_X, -255, 255);
-    Vd = constrain(Joy_Y + Joy_X, -255, 255);
+    Vg = constrain(-Joy_Y + Joy_X, -255, 255);
+    Vd = constrain(-Joy_Y - Joy_X, -255, 255);
 
     // Moteur gauche
     PWM('G', Vg);   
@@ -299,11 +299,28 @@ void DEBUG_MAG(void){
     Serial.println(mag.m.z);    // Affiche mag Z
 }
 
+float max_x = -2043;
+float min_x = -5188;
+float max_y = 2034;
+float min_y = -1327;
+
+float offset_x = (max_x + min_x)/2;
+float offset_y = (max_y + min_y)/2;
+
+float scale_x = (max_x - min_x)/2;
+float scale_y = (max_y - min_y)/2;
+float avg_scale = (scale_x + scale_y)/2;
+
+float cal_x;
+float cal_y;
+
 float Find_north (void){ //TODO calibration 
     mag.read();
-    float heading = atan2(mag.m.y, -mag.m.x) * 180 / PI;
-    if (heading < 0) heading += 360;
-    return heading;
+    float angle;
+    cal_x = (mag.m.x - offset_x) * (avg_scale/scale_x);
+    cal_y = (mag.m.y - offset_y) * (avg_scale/scale_y);
+    angle = atan2(cal_y, cal_x) * 180 / PI;
+    return angle;
 }
 
 void DEBUG_North (void){ //FIXME north programme

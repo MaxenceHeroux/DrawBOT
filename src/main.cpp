@@ -67,9 +67,9 @@ void loop() {
     // DEBUG_encodeur();     //Teleplot
     // DEBUG_IMU();          //Teleplot
     // DEBUG_MAG();          //Teleplot
-     DEBUG_angle();        //Teleplot
-    // DEBUG_North();        //Teleplot
-    //DEBUG_PID_distance();    //Teleplot
-    DEBUG_PID_angle();      //Teleplot
+    // DEBUG_angle();        //Teleplot
+    DEBUG_North();        //Teleplot
+    // DEBUG_PID_distance(); //Teleplot
+    // DEBUG_PID_angle();    //Teleplot
   }
 }
