@@ -25,7 +25,7 @@ void setup() {
 void loop() {
   server.handleClient(); //rafraichissement handler (server wifi)
   Remote();
-  
+
   if(DEBUG){
     Enable_Teleplot();
     //DEBUG_Blink();

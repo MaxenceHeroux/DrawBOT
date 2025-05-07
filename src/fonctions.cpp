@@ -141,7 +141,6 @@ void handleJoystick(void) {
     server.send(200, "text/plain", "OK");
 }
 
-//TODO void handleButton(void){}
 float radius;
 float xOrigin;
 float yOrigin;
@@ -168,7 +167,7 @@ void handleRose(void) {
 
     if (DEBUG) {
         Serial.printf("Type de rose des vents reçu : %s\n", type.c_str());
-    }
+    }
 
     server.send(200, "text/plain", "Rose OK");
 }
@@ -190,7 +189,7 @@ void handleSequence(void) {
     Serial.println(escalier_options);
   }
 
-  server.send(200, "text/plain", "OK");
+  server.send(200, "text/plain","OK");
 }
 
 float Kp;
