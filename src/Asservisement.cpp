@@ -65,38 +65,39 @@ void PID_vitesse (float KP, float KI, float KD){
 }
 */
 
-int erreur_D =0, erreur_D_prec =0;
-int Integrale_erreur_D =0;
-int Derive_erreur_D =0;
+int erreur_dist_D =0, erreur_dist_D_prec =0;
+int Integrale_erreur_dist_D =0;
+int Derive_erreur_dist_D =0;
 
-int erreur_G =0, erreur_G_prec =0;
-int Integrale_erreur_G =0;
-int Derive_erreur_G =0;
+int erreur_dist_G =0, erreur_dist_G_prec =0;
+int Integrale_erreur_dist_G =0;
+int Derive_erreur_dist_G =0;
 
 void PID_distance (float KP, float KI, float KD){
+    int commande_ticks_MD, commande_ticks_MG;
     //Moteur droit
-    erreur_D = consigne_MD - nb_tic_encodeur_D;                                                                    
-    Integrale_erreur_D +=  erreur_D;                                                             
-    Derive_erreur_D = erreur_D - erreur_D_prec;  
-    commande_ticks_MD = KP * erreur_D + KI * Integrale_erreur_D + KD * Derive_erreur_D;                   
-    erreur_D_prec = erreur_D;
+    erreur_dist_D = consigne_dist_MD - nb_tic_encodeur_D;                                                                    
+    Integrale_erreur_dist_D +=  erreur_dist_D;                                                             
+    Derive_erreur_dist_D = erreur_dist_D - erreur_dist_D_prec;  
+    commande_ticks_MD = KP * erreur_dist_D + KI * Integrale_erreur_dist_D + KD * Derive_erreur_dist_D;                   
+    erreur_dist_D_prec = erreur_dist_D;
 
-    if (commande_ticks_MD > 355) commande_MD =255;
-    else commande_MD = map(commande_ticks_MD,0,355,LOWEST_PWM,255);//map
-    commande_MD = constrain(commande_MD, -255, 255);
-    if(abs (commande_MG) <= LOWEST_PWM) commande_MD =0; //dead zone 
+    if (commande_ticks_MD > 355) commande_dist_MD =255;
+    else commande_dist_MD = map(commande_ticks_MD,0,355,LOWEST_PWM,255);//map
+    commande_dist_MD = constrain(commande_dist_MD, -255, 255);
+    if(abs (commande_dist_MG) <= LOWEST_PWM) commande_dist_MD =0; //dead zone 
 
     //moteur gauche 
-    erreur_G = consigne_MG - nb_tic_encodeur_G;                                                                    
-    Integrale_erreur_G +=  erreur_G;                                                             
-    Derive_erreur_G = erreur_G - erreur_G_prec;  
-    commande_ticks_MG = KP * erreur_G + KI * Integrale_erreur_G + KD * Derive_erreur_G;                   
-    erreur_G_prec = erreur_G;
+    erreur_dist_G = consigne_dist_MG - nb_tic_encodeur_G;                                                                    
+    Integrale_erreur_dist_G +=  erreur_dist_G;                                                             
+    Derive_erreur_dist_G = erreur_dist_G - erreur_dist_G_prec;  
+    commande_ticks_MG = KP * erreur_dist_G + KI * Integrale_erreur_dist_G + KD * Derive_erreur_dist_G;                   
+    erreur_dist_G_prec = erreur_dist_G;
 
-    if (commande_ticks_MG > 355) commande_MG =255;
-    else commande_MG = map(commande_ticks_MG,0,355,LOWEST_PWM,255);//map
-    commande_MG = constrain(commande_MG, -255, 255);
-    if(abs (commande_MG) <= LOWEST_PWM) commande_MG =0; //dead zone 
+    if (commande_ticks_MG > 355) commande_dist_MG =255;
+    else commande_dist_MG = map(commande_ticks_MG,0,355,LOWEST_PWM,255);//map
+    commande_dist_MG = constrain(commande_dist_MG, -255, 255);
+    if(abs (commande_dist_MG) <= LOWEST_PWM) commande_dist_MG =0; //dead zone 
 }
 
 void DEBUG_PID_distance (void){
@@ -104,19 +105,19 @@ void DEBUG_PID_distance (void){
     Serial.println(nb_tic_encodeur_D);
 
     Serial.print(">Consigne_attendu_tic_D:"); //consigne
-    Serial.println(consigne_MD);
+    Serial.println(consigne_dist_MD);
 
     Serial.print(">Vitesse_moteur_D:");       //vitesse Moteur
-    Serial.println(commande_MD);
+    Serial.println(commande_dist_MD);
 
     Serial.print(">Consigne_tic_G:");         //PID consigne
     Serial.println(nb_tic_encodeur_G);
 
     Serial.print(">Consigne_attendu_tic_G:"); //consigne
-    Serial.println(consigne_MG);
+    Serial.println(consigne_dist_MG);
 
     Serial.print(">Vitesse_moteur_G:");       //vitesse Moteur 
-    Serial.println(commande_MG);
+    Serial.println(commande_dist_MG);
 }
 
 float Ticks_to_Distance (int distance){
@@ -126,3 +127,31 @@ float Ticks_to_Distance (int distance){
     return ticks;
 }
 
+int erreur_rot_D =0, erreur_rot_D_prec =0;
+int Integrale_erreur_rot_D =0;
+int Derive_erreur_rot_D =0;
+
+// int erreur_rot_G =0, erreur_rot_G_prec =0;
+// int Integrale_erreur_rot_G =0;
+// int Derive_erreur_rot_G =0;
+
+void PID_rotation(float KP, float KI, float KD){
+    int commande_rot_deg_MD, commande_rot_deg_MG;
+    //Moteur droit
+    erreur_rot_D = consigne_rot_MD - Find_angle();                                                                  
+    Integrale_erreur_rot_D +=  erreur_rot_D;    
+    Derive_erreur_rot_D = erreur_rot_D - erreur_rot_D_prec;  
+    commande_rot_deg_MD = KP * erreur_rot_D + KI * Integrale_erreur_rot_D + KD * Derive_erreur_rot_D;                   
+    erreur_rot_D_prec = erreur_rot_D;
+
+    commande_rot_MD = map(commande_rot_deg_MD, -180, 180, -255, 255);
+    commande_rot_MD = constrain(commande_rot_MD, -255, 255);
+
+    if (abs(commande_rot_MD) < LOWEST_PWM) { // Dead zone
+        commande_rot_MD = 0;
+    }
+
+    //apliquer une roation opossé aux deux moteurs
+    commande_rot_MG = commande_rot_MD;
+    commande_rot_MD = -commande_rot_MD;
+}
