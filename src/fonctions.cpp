@@ -145,7 +145,7 @@ void handleJoystick(void) {
 float radius;
 float xOrigin;
 float yOrigin;
-void handleCircle() {
+void handleCircle(void) {
     radius = server.arg("radius").toFloat();
     xOrigin = server.arg("xOrigin").toFloat();
     yOrigin = server.arg("yOrigin").toFloat();
@@ -157,14 +157,40 @@ void handleCircle() {
     server.send(200, "text/plain", "Cercle OK");
 }
 
-void handleRose() {
+int windrose = 0;
+void handleRose(void) {
     String type = server.arg("type");
+    if (type == "windrose") {
+        windrose = 1; //Fais une rose des vents
+    } else if (type == "arrow") {
+        windrose = 2; //Fais une flèche
+    }
 
     if (DEBUG) {
         Serial.printf("Type de rose des vents reçu : %s\n", type.c_str());
-    }
+    }
 
     server.send(200, "text/plain", "Rose OK");
+}
+
+int escalier_options = 0; // Fais rien quand il est à 0
+void handleSequence(void) {
+  String type = server.arg("type");
+  
+  if (type == "step") {
+    escalier_options = 1; //Fais un escalier
+  } else if (type == "line") {
+    escalier_options = 2; //Avancer en ligne droite
+  } else if (type == "rotate") {
+    escalier_options = 3; //Fais une rotation de 90°
+  }
+
+  if (DEBUG) {
+    Serial.print("Séquence sélectionnée : ");
+    Serial.println(escalier_options);
+  }
+
+  server.send(200, "text/plain", "OK");
 }
 
 float Kp;
@@ -201,6 +227,7 @@ void Enable_wifi(void){
     server.on("/pid", handlePID);           //page debug
     server.on("/circle", handleCircle);     //page cercle
     server.on("/rose", handleRose);         //page rose des vents
+    server.on("/sequence",handleSequence);  //page escalier
     server.on("/favicon.ico", []() {        // Évite les erreurs
         server.send(204); 
     });
