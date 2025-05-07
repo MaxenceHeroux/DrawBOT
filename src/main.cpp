@@ -32,7 +32,7 @@ void loop() {
     //DEBUG_pwm();
     // DEBUG_encodeur(); //Teleplot
     // DEBUG_IMU();      //Teleplot
-    // DEBUG_MAG();      //Teleplot
+    DEBUG_MAG();      //Teleplot
     DEBUG_angle();    //Teleplot
     //DEBUG_North();    //Teleplot
   }
