@@ -4,7 +4,6 @@
 String htmlPage = R"rawliteral(
     
 <!-- ecrire le HTML ICI : -->
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,37 +12,171 @@ String htmlPage = R"rawliteral(
   <style>
     body {
       font-family: sans-serif;
-      text-align: center;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    h1 {
+      color: #333;
+      margin-top: 30px;
     }
     #joystickZone {
-      width: 400px;
-      height: 400px;
-      background: #eee;
+      width: 300px;
+      height: 300px;
+      background: #ddd;
       border-radius: 50%;
       position: relative;
-      margin: 20px auto;
-      touch-action: none;
+      margin: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      border: 2px solid #ccc;
     }
     #stick {
-      width: 100px;
-      height: 100px;
+      width: 80px;
+      height: 80px;
       background: #333;
       border-radius: 50%;
       position: absolute;
-      top: 150px;
-      left: 150px;
+      top: 110px;
+      left: 110px;
+      cursor: pointer;
     }
     #values {
-      font-size: 1.4em;
-      margin-bottom: 20px;
+      font-size: 1.2em;
+      margin-top: 20px;
+    }
+    #values span {
+      font-weight: bold;
     }
     .param {
       margin: 10px;
     }
-    .button-sequence {
-      margin: 5px;
+    .button-sequence, #circleButton, #roseButton, #debugButton, #escalierButton {
+      margin: 10px;
       padding: 10px 20px;
       font-size: 1em;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+    .button-sequence:hover, #circleButton:hover, #roseButton:hover, #debugButton:hover, #escalierButton:hover {
+      background-color: #0056b3;
+      transform: scale(1.05);
+    }
+    .button-sequence:active, #circleButton:active, #roseButton:active, #debugButton:active, #escalierButton:active {
+      background-color: #1e7e34;
+      transform: scale(1);
+    }
+    #circleModal, #debugModal, #roseModal, #escalierModal {
+      display: none;
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: white;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      width: 300px;
+      z-index: 1000;
+    }
+    .modal-header {
+      font-size: 1.4em;
+      margin-bottom: 10px;
+      color: #007bff;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 10px;
+    }
+    .modal-body input {
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1em;
+      width: 100%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .modal-footer button {
+      margin-left: 10px;
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal-footer button:hover {
+      background-color: #0056b3;
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+
+    /* Boutons dans la fenêtre Escalier */
+    #escalierModal .modal-body button,
+    #roseModal .modal-body button {
+      padding: 12px 20px;
+      font-size: 1.1em;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 10px 0;
+      transition: background-color 0.3s, transform 0.2s;
+      width: 100%;
+    }
+
+    #escalierModal .modal-body button:hover,
+    #roseModal .modal-body button:hover {
+      background-color: #218838;
+      transform: scale(1.05);
+    }
+
+    #escalierModal .modal-body button:active,
+    #roseModal .modal-body button:active {
+      background-color: #1e7e34;
+      transform: scale(1);
+    }
+
+    /* Stylisation des formulaires dans les modaux Cercle, Debug, Rose des Vents */
+    .modal-body input {
+      padding: 12px;
+      font-size: 1.1em;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .modal-body label {
+      font-size: 1.1em;
+      color: #333;
+    }
+
+    /* Mise en ligne des boutons principaux */
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
     }
   </style>
 </head>
@@ -59,18 +192,68 @@ String htmlPage = R"rawliteral(
     Y: <span id="yVal">0</span>
   </div>
 
-  <h2>Contrôle PID</h2>
-  <div>
-    <label class="param">KP: <input type="number" id="kp" step="0.1" value="1.0"></label>
-    <label class="param">KI: <input type="number" id="ki" step="0.1" value="0.0"></label>
-    <label class="param">KD: <input type="number" id="kd" step="0.1" value="0.0"></label>
-    <button onclick="sendPID()">Envoyer PID</button>
+  <h2><b>Options DrawBOT</b></h2>
+
+  <div class="button-container">
+    <button id="escalierButton" onclick="openEscalierModal()">Escalier</button>
+    <button id="circleButton" onclick="openCircleModal()">Cercle</button>
+    <button id="roseButton" onclick="openRoseModal()">Rose des Vents</button>
+    <button id="debugButton" onclick="openDebugModal()">Debug</button>
   </div>
 
-  <h2>Séquences DrawBOT</h2>
-  <button class="button-sequence" onclick="sendSequence('rotate')">Rotation 90°</button>
-  <button class="button-sequence" onclick="sendSequence('line')">Avancer en ligne droite</button>
-  <button class="button-sequence" onclick="sendSequence('step')">Tracer un escalier</button>
+  <!-- Modal pour le cercle -->
+  <div class="overlay" id="overlay"></div>
+  <div id="circleModal">
+    <div class="modal-header">Paramètres du Cercle</div>
+    <div class="modal-body">
+        <label>Rayon (en cm): <input type="number" id="circleRadius" value="10" min="1"></label><br>
+        <label>Origine X: <input type="number" id="circleXOrigin" value="0" min="0"></label><br>
+        <label>Origine Y: <input type="number" id="circleYOrigin" value="0" min="0"></label><br>
+    </div>
+    <div class="modal-footer">
+        <button onclick="closeCircleModal()">Fermer</button>
+        <button onclick="sendCircleParams()">Envoyer</button>
+    </div>
+  </div>
+
+  <!-- Modal pour le Debug -->
+  <div id="debugModal">
+    <div class="modal-header">Paramètres PID</div>
+    <div class="modal-body">
+      <label>KP: <input type="number" id="kp" value="1.0" step="0.1"></label><br>
+      <label>KI: <input type="number" id="ki" value="0.0" step="0.1"></label><br>
+      <label>KD: <input type="number" id="kd" value="0.0" step="0.1"></label><br>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeDebugModal()">Fermer</button>
+      <button onclick="sendDebugParams()">Envoyer</button>
+    </div>
+  </div>
+
+  <!-- Modal pour Rose des Vents -->
+  <div id="roseModal">
+    <div class="modal-header">Choisir une séquence Rose des Vents</div>
+    <div class="modal-body">
+      <button onclick="sendRoseSequence('windrose')">Tracer une rose des vents</button><br>
+      <button onclick="sendRoseSequence('arrow')">Tracer une flèche</button><br>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeRoseModal()">Fermer</button>
+    </div>
+  </div>
+
+  <!-- Modal pour Escalier -->
+  <div id="escalierModal">
+    <div class="modal-header">Choisir une séquence</div>
+    <div class="modal-body">
+      <button onclick="sendSequence('step')">Tracer un escalier</button><br>
+      <button onclick="sendSequence('line')">Avancer en ligne droite</button><br>
+      <button onclick="sendSequence('rotate')">Rotation 90°</button>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeEscalierModal()">Fermer</button>
+    </div>
+  </div>
 
   <script>
     const zone = document.getElementById("joystickZone");
@@ -115,20 +298,72 @@ String htmlPage = R"rawliteral(
       fetch(`/joy?x=0&y=0`).catch(e => {});
     });
 
-    function sendPID() {
+    function sendSequence(seq) {
+      fetch(`/sequence?type=${seq}`).catch(e => {});
+    }
+
+    function sendRoseSequence(seq) {
+      fetch(`/rose?type=${seq}`).catch(e => {});
+    }
+
+    function openCircleModal() {
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("circleModal").style.display = "block";
+    }
+
+    function closeCircleModal() {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("circleModal").style.display = "none";
+    }
+
+    function sendCircleParams() {
+      const radius = document.getElementById("circleRadius").value;
+      const xOrigin = document.getElementById("circleXOrigin").value;
+      const yOrigin = document.getElementById("circleYOrigin").value;
+      fetch(`/circle?radius=${radius}&xOrigin=${xOrigin}&yOrigin=${yOrigin}`).catch(e => {});
+      closeCircleModal();
+    }
+
+    function openDebugModal() {
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("debugModal").style.display = "block";
+    }
+
+    function closeDebugModal() {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("debugModal").style.display = "none";
+    }
+
+    function sendDebugParams() {
       const kp = document.getElementById("kp").value;
       const ki = document.getElementById("ki").value;
       const kd = document.getElementById("kd").value;
       fetch(`/pid?kp=${kp}&ki=${ki}&kd=${kd}`).catch(e => {});
+      closeDebugModal();
     }
 
-    function sendSequence(seq) {
-      fetch(`/sequence?type=${seq}`).catch(e => {});
+    function openRoseModal() {
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("roseModal").style.display = "block";
+    }
+
+    function closeRoseModal() {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("roseModal").style.display = "none";
+    }
+
+    function openEscalierModal() {
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("escalierModal").style.display = "block";
+    }
+
+    function closeEscalierModal() {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("escalierModal").style.display = "none";
     }
   </script>
 </body>
 </html>
-
 
 
   <!-- Fin du HTML-->
