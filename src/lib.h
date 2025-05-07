@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 // User led
 #define LEDU1 25
@@ -60,6 +60,14 @@ extern String htmlPage;
 extern int Joy_X, Joy_Y; //sortie du joystick
 extern bool joystickConnecte;
 extern unsigned long lastJoystickTime;
+extern float radius;
+extern float xOrigin;
+extern float yOrigin;
+extern int windrose;
+extern int escalier_options;
+extern float Kp;
+extern float Ki;
+extern float Kd;
 
 //IMU
 #include "SparkFunLSM6DS3.h" //todo registre = moins d espace gaspiller avec le spi ...

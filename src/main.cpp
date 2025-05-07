@@ -33,6 +33,7 @@ int commande_rot_MD =0, commande_rot_MG =0; //sortie du pid
 void loop() {
   server.handleClient(); //rafraichissement handler (server wifi)
   Remote();
+<<<<<<< HEAD
   int commande_MD, commande_MG;
 
   if(millis()<10000){
@@ -71,5 +72,17 @@ void loop() {
     DEBUG_North();        //Teleplot
     // DEBUG_PID_distance(); //Teleplot
     // DEBUG_PID_angle();    //Teleplot
+=======
+
+  if(DEBUG){
+    Enable_Teleplot();
+    //DEBUG_Blink();
+    //DEBUG_pwm();
+    // DEBUG_encodeur(); //Teleplot
+    // DEBUG_IMU();      //Teleplot
+    DEBUG_MAG();      //Teleplot
+    DEBUG_angle();    //Teleplot
+    //DEBUG_North();    //Teleplot
+>>>>>>> gaetan_interface
   }
 }

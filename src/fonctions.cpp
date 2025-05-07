@@ -133,6 +133,7 @@ void handleRoot(void) {
     server.send(200, "text/html; charset=UTF-8", htmlPage);
 }
 
+int Joy_X, Joy_Y;
 unsigned long lastJoystickTime = 0;
 void handleJoystick(void) {
     Joy_X = server.arg("x").toInt(); 
@@ -146,9 +147,72 @@ void handleJoystick(void) {
     server.send(200, "text/plain", "OK");
 }
 
-//TODO void handleButton(void){}
+float radius;
+float xOrigin;
+float yOrigin;
+void handleCircle(void) {
+    radius = server.arg("radius").toFloat();
+    xOrigin = server.arg("xOrigin").toFloat();
+    yOrigin = server.arg("yOrigin").toFloat();
 
-int Joy_X, Joy_Y;
+    if (DEBUG) {
+        Serial.printf("Cercle reçu : rayon=%.2f, centre=(%.2f, %.2f)\n", radius, xOrigin, yOrigin);
+    }
+
+    server.send(200, "text/plain", "Cercle OK");
+}
+
+int windrose = 0;
+void handleRose(void) {
+    String type = server.arg("type");
+    if (type == "windrose") {
+        windrose = 1; //Fais une rose des vents
+    } else if (type == "arrow") {
+        windrose = 2; //Fais une flèche
+    }
+
+    if (DEBUG) {
+        Serial.printf("Type de rose des vents reçu : %s\n", type.c_str());
+    }
+
+    server.send(200, "text/plain", "Rose OK");
+}
+
+int escalier_options = 0; // Fais rien quand il est à 0
+void handleSequence(void) {
+  String type = server.arg("type");
+  
+  if (type == "step") {
+    escalier_options = 1; //Fais un escalier
+  } else if (type == "line") {
+    escalier_options = 2; //Avancer en ligne droite
+  } else if (type == "rotate") {
+    escalier_options = 3; //Fais une rotation de 90°
+  }
+
+  if (DEBUG) {
+    Serial.print("Séquence sélectionnée : ");
+    Serial.println(escalier_options);
+  }
+
+  server.send(200, "text/plain","OK");
+}
+
+float Kp;
+float Ki;
+float Kd;
+void handlePID() {
+    Kp = server.arg("kp").toFloat();
+    Ki = server.arg("ki").toFloat();
+    Kd = server.arg("kd").toFloat();
+
+    if (DEBUG) {
+        Serial.printf("Réception PID : Kp=%.2f, Ki=%.2f, Kd=%.2f\n", Kp, Ki, Kd);
+    }
+
+    server.send(200, "text/plain", "PID OK");
+}
+
 void Enable_wifi(void){
     // Définir l'IP statique pour le point d'accès
     IPAddress local_IP(192, 168, 14, 14);     // nouvelle IP
@@ -165,6 +229,10 @@ void Enable_wifi(void){
     // Configurer le serveur web
     server.on("/", handleRoot);             //page principale 
     server.on("/joy", handleJoystick);      //page joystick
+    server.on("/pid", handlePID);           //page debug
+    server.on("/circle", handleCircle);     //page cercle
+    server.on("/rose", handleRose);         //page rose des vents
+    server.on("/sequence",handleSequence);  //page escalier
     server.on("/favicon.ico", []() {        // Évite les erreurs
         server.send(204); 
     });
