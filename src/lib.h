@@ -7,8 +7,8 @@
 #define LEDU2 26
 
 //moteurs
-#define LOWEST_PWM 25
-#define SEUIL_TICKS_DECELLERATION 70
+#define LOWEST_PWM 50
+#define SEUIL_TICKS_DECELLERATION 700
 // Enable moteurs droit et gauche
 #define EN_D 23
 #define EN_G 4
@@ -115,3 +115,5 @@ void DEBUG_PID_distance (void);
 float Ticks_to_Distance (int ticks);
 void PID_rotation(float KP, float KI, float KD);
 void DEBUG_PID_angle (void);
+
+void DEBUG_asservissement (int dist , int angle);

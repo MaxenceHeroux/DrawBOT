@@ -81,6 +81,7 @@ void PID_distance (float KP, float KI, float KD){ //TODO : kp roue droite kp rou
     Derive_erreur_dist_D = erreur_dist_D - erreur_dist_D_prec;  
     commande_ticks_MD = KP * erreur_dist_D + KI * Integrale_erreur_dist_D + KD * Derive_erreur_dist_D;                   
     erreur_dist_D_prec = erreur_dist_D;
+    //TODO Integrale_erreur_dist_D = constrain(Integrale_erreur_dist_D, -I_MAX, I_MAX); //anti wind up
 
     int sign_D = signe(commande_ticks_MD);
     if (abs(commande_ticks_MD) > SEUIL_TICKS_DECELLERATION) commande_dist_MD = 255;
@@ -102,6 +103,14 @@ void PID_distance (float KP, float KI, float KD){ //TODO : kp roue droite kp rou
     commande_dist_MG = abs(commande_ticks_MG) * sign_G;
     commande_dist_MG = constrain(commande_dist_MG, -255, 255);
     if (abs(commande_dist_MG) < LOWEST_PWM) commande_dist_MG = 0;
+
+    //reset des erreurs
+    if (abs(erreur_dist_D) < 10 && abs(erreur_dist_G) < 10) {
+        Integrale_erreur_dist_D = 0;
+        Derive_erreur_dist_D = 0;
+        Integrale_erreur_dist_G = 0;
+        Derive_erreur_dist_G = 0;
+    }
 }
 
 void DEBUG_PID_distance (void){
@@ -134,11 +143,7 @@ float Ticks_to_Distance (int distance){
 int erreur_rot_D =0, erreur_rot_D_prec =0;
 int Integrale_erreur_rot_D =0;
 int Derive_erreur_rot_D =0;
-
-// int erreur_rot_G =0, erreur_rot_G_prec =0;
-// int Integrale_erreur_rot_G =0;
-// int Derive_erreur_rot_G =0;
-int commande_rot_deg_MD, commande_rot_deg_MG;
+int commande_rot_deg_MD;
 
 void PID_rotation(float KP, float KI, float KD){ //TODO EKF avec l angle via encodeur (dr-dz)/2
     //Moteur droit
@@ -155,6 +160,10 @@ void PID_rotation(float KP, float KI, float KD){ //TODO EKF avec l angle via enc
         commande_rot_MD = 0;
     }
 
+    // if (abs(commande_rot_MD) < LOWEST_PWM && abs(commande_rot_deg_MD) > 10) {
+    //     commande_rot_MD = signe(commande_rot_MD) * 80; // kickstart à 80
+    // }
+
     //apliquer une roation opossé aux deux moteurs
     commande_rot_MG = commande_rot_MD;
     commande_rot_MD = -commande_rot_MD;
@@ -167,9 +176,34 @@ void DEBUG_PID_angle (void){
     Serial.print(">Consigne_attendu_angle_D:"); //consigne
     Serial.println(consigne_rot_MD);
 
-    Serial.print(">Vitesse_moteur_D:");       //vitesse Moteur
+    Serial.print(">Vitesse_moteur_D:");         //vitesse Moteur
     Serial.println(commande_rot_MD);
 
-    Serial.print(">Vitesse_moteur_G:");       //vitesse Moteur 
+    Serial.print(">Vitesse_moteur_G:");         //vitesse Moteur 
     Serial.println(commande_rot_MG);
+}
+
+void DEBUG_asservissement (int dist , int angle){
+    int commande_MD, commande_MG;
+
+    if(millis()<10000){ //TODO  ajouter une rampe 28:06 min  + angle correction 34:05 min 
+        //DISTANCE
+        consigne_dist_MD =(int)Ticks_to_Distance(dist);  
+        consigne_dist_MG =(int)Ticks_to_Distance(dist); 
+
+        PID_distance(0.3,0.001,0.2); //TODO a regler pid distance 
+
+        commande_MD = commande_dist_MD;
+        commande_MG = commande_dist_MG; 
+    }else{
+        //ANGLE
+        consigne_rot_MD = angle;
+
+        PID_rotation(1.5,0,0); //TODO regler angle (dead zone IMU ?) if roue ne tourne pas alors Ki = 0
+
+        commande_MD = commande_rot_MD;
+        commande_MG = commande_rot_MG;
+    }
+    PWM('D',commande_MD);
+    PWM('G',commande_MG);
 }
