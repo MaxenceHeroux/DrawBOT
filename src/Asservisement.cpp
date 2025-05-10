@@ -5,7 +5,7 @@
   Fonction utile : PWM () Get orientation_by_IMU () Findnorth() EKF()
 --------------------------------------------------------------------------------*/ 
 /*
-int previousMillis =0; //TODO PID vitesse (on a pas fait tt ca pour rien mdr !)
+int previousMillis =0; //TODO PID vitesse EKF distance (on a pas fait tt ca pour rien mdr !) attention a bien renomé les variables 
 
 int Mini_boucle (void){
     if( millis() - previousMillis >100) {
@@ -73,7 +73,7 @@ int erreur_dist_G =0, erreur_dist_G_prec =0;
 int Integrale_erreur_dist_G =0;
 int Derive_erreur_dist_G =0;
 
-void PID_distance (float KP, float KI, float KD){
+void PID_distance (float KP, float KI, float KD){ //TODO : kp roue droite kp roue gauche etc (sinon moyenne de l avancement et un pid)
     int commande_ticks_MD, commande_ticks_MG;
     //Moteur droit
     erreur_dist_D = consigne_dist_MD - nb_tic_encodeur_D;                                                                    
@@ -82,10 +82,12 @@ void PID_distance (float KP, float KI, float KD){
     commande_ticks_MD = KP * erreur_dist_D + KI * Integrale_erreur_dist_D + KD * Derive_erreur_dist_D;                   
     erreur_dist_D_prec = erreur_dist_D;
 
-    if (commande_ticks_MD > 355) commande_dist_MD =255;
-    else commande_dist_MD = map(commande_ticks_MD,0,355,LOWEST_PWM,255);//map
+    int sign_D = signe(commande_ticks_MD);
+    if (abs(commande_ticks_MD) > SEUIL_TICKS_DECELLERATION) commande_dist_MD = 255;
+    else commande_dist_MD = map(abs(commande_ticks_MD), 0, SEUIL_TICKS_DECELLERATION, LOWEST_PWM, 255);
+    commande_dist_MD = abs(commande_ticks_MD) * sign_D;
     commande_dist_MD = constrain(commande_dist_MD, -255, 255);
-    if(abs (commande_dist_MG) <= LOWEST_PWM) commande_dist_MD =0; //dead zone 
+    if (abs(commande_dist_MD) < LOWEST_PWM) commande_dist_MD = 0;
 
     //moteur gauche 
     erreur_dist_G = consigne_dist_MG - nb_tic_encodeur_G;                                                                    
@@ -94,10 +96,12 @@ void PID_distance (float KP, float KI, float KD){
     commande_ticks_MG = KP * erreur_dist_G + KI * Integrale_erreur_dist_G + KD * Derive_erreur_dist_G;                   
     erreur_dist_G_prec = erreur_dist_G;
 
-    if (commande_ticks_MG > 355) commande_dist_MG =255;
-    else commande_dist_MG = map(commande_ticks_MG,0,355,LOWEST_PWM,255);//map
+    int sign_G = signe(commande_ticks_MG);
+    if (abs(commande_ticks_MG) > SEUIL_TICKS_DECELLERATION) commande_dist_MG = 255;
+    else commande_dist_MG = map(abs(commande_ticks_MG), 0, SEUIL_TICKS_DECELLERATION, LOWEST_PWM, 255);
+    commande_dist_MG = abs(commande_ticks_MG) * sign_G;
     commande_dist_MG = constrain(commande_dist_MG, -255, 255);
-    if(abs (commande_dist_MG) <= LOWEST_PWM) commande_dist_MG =0; //dead zone 
+    if (abs(commande_dist_MG) < LOWEST_PWM) commande_dist_MG = 0;
 }
 
 void DEBUG_PID_distance (void){
@@ -136,7 +140,7 @@ int Derive_erreur_rot_D =0;
 // int Derive_erreur_rot_G =0;
 int commande_rot_deg_MD, commande_rot_deg_MG;
 
-void PID_rotation(float KP, float KI, float KD){
+void PID_rotation(float KP, float KI, float KD){ //TODO EKF avec l angle via encodeur (dr-dz)/2
     //Moteur droit
     erreur_rot_D = consigne_rot_MD - Find_angle();                                                                  
     Integrale_erreur_rot_D +=  erreur_rot_D;    

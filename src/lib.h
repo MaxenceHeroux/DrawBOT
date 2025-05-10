@@ -1,13 +1,14 @@
 #include <Arduino.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 // User led
 #define LEDU1 25
 #define LEDU2 26
 
 //moteurs
-#define LOWEST_PWM 20
+#define LOWEST_PWM 25
+#define SEUIL_TICKS_DECELLERATION 70
 // Enable moteurs droit et gauche
 #define EN_D 23
 #define EN_G 4
@@ -81,6 +82,7 @@ extern LSM6DS3 myIMU;
 extern LIS3MDL mag;
 
 //fonctions.cpp
+int signe(int val);
 void DEBUG_Blink(void);
 void Enable_moteur(void);
 void Disable_moteur(void);
@@ -95,7 +97,6 @@ void handleRoot(void);
 void handleJoystick(void);
 void Enable_wifi(void);
 void Remote (void);
-void Enable_Teleplot(void);
 void Enable_IMU (void);
 void DEBUG_IMU (void);
 float Find_angle (void);

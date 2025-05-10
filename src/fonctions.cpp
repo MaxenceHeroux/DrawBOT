@@ -1,4 +1,9 @@
 #include <lib.h>
+int signe(int val) {
+    if (val > 0) return 1;
+    if (val < 0) return -1;
+    return 0;
+}
 
 void DEBUG_Blink(void){
     digitalWrite(LEDU1, HIGH); 
@@ -271,16 +276,8 @@ void Remote (void){
   }
 }
 
-float  i =0;
 float angle_total_Z = 0;              // Angle cumulé en degrés
 unsigned long temps_precedent = 0;    // Temps de la dernière mesure
-
-void Enable_Teleplot(void){
-    // Print log (teleplot)
-    i += 0.1;
-    Serial.print("loop:");
-    Serial.println(i);
-}
 
 LSM6DS3 myIMU;
 void Enable_IMU (void){
@@ -323,7 +320,7 @@ void DEBUG_IMU (void){
 
 float Find_angle (void){
     float vitesse_Z = myIMU.readFloatGyroZ();
-    if (abs(vitesse_Z) < 3.5) vitesse_Z = 0; // Filtrage du bruit (dead zone = 3)
+    if (abs(vitesse_Z) < 4) vitesse_Z = 0; // Filtrage du bruit (dead zone = 3)
 
     unsigned long temps_actuel = millis();
     float duree = (temps_actuel - temps_precedent) / 1000.0; //sec
