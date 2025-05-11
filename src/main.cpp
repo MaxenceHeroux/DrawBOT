@@ -21,19 +21,19 @@ void setup() {
   Enable_MAG();
 }
 
-
-int consigne_dist_MD =0, consigne_dist_MG =0;
-int commande_dist_MD =0, commande_dist_MG =0; //sortie du pid
-
-int consigne_rot_MD =0, consigne_rot_MG =0;
-int commande_rot_MD =0, commande_rot_MG =0; //sortie du pid
-
+int consigne_dist;
 
 void loop() {
   server.handleClient(); //rafraichissement handler (server wifi)
   Remote();
-  
-  DEBUG_asservissement(1000,45);
+
+  consigne_dist = (int)Kp;
+  if (Avancer(consigne_dist,0.3,0.001,0.2)){
+    digitalWrite(LEDU1,HIGH);
+  }else {
+    digitalWrite(LEDU1,LOW);
+    digitalWrite(LEDU2,HIGH);
+  }
 
   if(DEBUG){
     // DEBUG_Blink();
@@ -41,9 +41,9 @@ void loop() {
     // DEBUG_encodeur();     //Teleplot
     // DEBUG_IMU();          //Teleplot
     // DEBUG_MAG();          //Teleplot
-    // DEBUG_angle();        //Teleplot
-    DEBUG_North();        //Teleplot
-    DEBUG_PID_distance(); //Teleplot
-    DEBUG_PID_angle();    //Teleplot
+    //DEBUG_angle();        //Teleplot
+    // DEBUG_North();        //Teleplot
+    DEBUG_PID_distance(consigne_dist); //Teleplot
+    //DEBUG_PID_angle();    //Teleplot
   }
 }

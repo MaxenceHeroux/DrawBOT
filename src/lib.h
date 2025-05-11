@@ -8,7 +8,7 @@
 
 //moteurs
 #define LOWEST_PWM 50
-#define SEUIL_TICKS_DECELLERATION 700
+#define SEUIL_TICKS_DECELLERATION 2000
 // Enable moteurs droit et gauche
 #define EN_D 23
 #define EN_G 4
@@ -26,11 +26,7 @@ const int freq = 1000;        // fréquence PWM en Hz
 const int resolution = 8;     // résolution 8 bits (0-255)
 
 //PID
-extern int consigne_dist_MD, consigne_dist_MG;
-extern int commande_dist_MD, commande_dist_MG;
 
-extern int consigne_rot_MD, consigne_rot_MG;
-extern int commande_rot_MD, commande_rot_MG;
 
 //Encodeurs
 #define COEFF_MOTEUR 0.66 // ~255/350 // commande pwm 255 = 255 tour de roue par mini boucle, objectif : exprimer les tiques en proportion du pwm 255 -> 350 ticks X->, permet le calcul de l'erreur et le pid sans faire (pwm = cb de ticks et apres erreur puis re pwm pour le pid)
@@ -38,12 +34,10 @@ extern int commande_rot_MD, commande_rot_MG;
 #define ENC_D_CH_A 27
 #define ENC_D_CH_B 14
 extern long nb_tic_encodeur_D;
-//extern long nb_tic_encodeur_D_prec;
 // Encodeur gauche
 #define ENC_G_CH_A 32
 #define ENC_G_CH_B 33
 extern long nb_tic_encodeur_G;
-//extern long nb_tic_encodeur_G_prec;
 
 // I2C
 #include <Wire.h>
@@ -107,13 +101,7 @@ float Find_north (void);
 void DEBUG_North (void);
 
 //Asservissement.cpp
-int Mini_boucle (void);
-void ENC_vitesse (void);
-void PID_vitesse (float KP, float KI, float KD);
-void PID_distance (float KP, float KI, float KD);
-void DEBUG_PID_distance (void);
-float Ticks_to_Distance (int ticks);
-void PID_rotation(float KP, float KI, float KD);
-void DEBUG_PID_angle (void);
-
-void DEBUG_asservissement (int dist , int angle);
+int Ticks_to_Distance (int distance);
+int Avancer (int dist_consigne, float KP, float KI, float KD);
+void Reset_pid_distance (void);
+void DEBUG_PID_distance (int consigne_dist);

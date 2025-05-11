@@ -318,9 +318,10 @@ void DEBUG_IMU (void){
     Serial.println(myIMU.readTempC());
 }
 
+
 float Find_angle (void){
     float vitesse_Z = myIMU.readFloatGyroZ();
-    if (abs(vitesse_Z) < 4) vitesse_Z = 0; // Filtrage du bruit (dead zone = 3)
+    if (abs(vitesse_Z) < 3.5) vitesse_Z = 0; // Filtrage du bruit (dead zone = 3)
 
     unsigned long temps_actuel = millis();
     float duree = (temps_actuel - temps_precedent) / 1000.0; //sec
@@ -333,7 +334,6 @@ float Find_angle (void){
     // if (angle_total_Z < 0) angle_total_Z += 360.0;
 
     return angle_total_Z;
-    
 }
 
 void DEBUG_angle(void){
