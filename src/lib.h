@@ -9,7 +9,7 @@
 //moteurs
 #define LOWEST_PWM 50
 #define SEUIL_TICKS_DECELLERATION 2000
-#define SEUIL_ANGLE_DECELLERATION 90
+#define SEUIL_ANGLE_DECELLERATION 45
 // Enable moteurs droit et gauche
 #define EN_D 23
 #define EN_G 4
@@ -92,7 +92,7 @@ void DEBUG_encodeur(void);
 void handleRoot(void);
 void handleJoystick(void);
 void Enable_wifi(void);
-void Remote (void);
+int Remote (void);
 void Enable_IMU (void);
 void DEBUG_IMU (void);
 float Find_angle (void);
