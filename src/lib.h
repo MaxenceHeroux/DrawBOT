@@ -9,6 +9,7 @@
 //moteurs
 #define LOWEST_PWM 50
 #define SEUIL_TICKS_DECELLERATION 2000
+#define SEUIL_ANGLE_DECELLERATION 90
 // Enable moteurs droit et gauche
 #define EN_D 23
 #define EN_G 4
@@ -26,7 +27,8 @@ const int freq = 1000;        // fréquence PWM en Hz
 const int resolution = 8;     // résolution 8 bits (0-255)
 
 //PID
-
+extern int commande_pwm_dist_MD, commande_pwm_dist_MG;
+extern int commande_pwm_angle_MD, commande_pwm_angle_MG;
 
 //Encodeurs
 #define COEFF_MOTEUR 0.66 // ~255/350 // commande pwm 255 = 255 tour de roue par mini boucle, objectif : exprimer les tiques en proportion du pwm 255 -> 350 ticks X->, permet le calcul de l'erreur et le pid sans faire (pwm = cb de ticks et apres erreur puis re pwm pour le pid)
@@ -105,3 +107,7 @@ int Ticks_to_Distance (int distance);
 int Avancer (int dist_consigne, float KP, float KI, float KD);
 void Reset_pid_distance (void);
 void DEBUG_PID_distance (int consigne_dist);
+
+int Tourner (int angle, float KP, float KI, float KD);
+void Reset_pid_angle(void);
+void DEBUG_PID_angle (int consigne_angle);
