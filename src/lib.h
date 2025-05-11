@@ -92,7 +92,7 @@ void DEBUG_encodeur(void);
 void handleRoot(void);
 void handleJoystick(void);
 void Enable_wifi(void);
-int Remote (void);
+void Remote (void);
 void Enable_IMU (void);
 void DEBUG_IMU (void);
 float Find_angle (void);

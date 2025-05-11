@@ -249,12 +249,11 @@ void Enable_wifi(void){
     Serial.println("Serveur HTTP lancé.");
 }
 
-int Remote (void){
+void Remote (void){
     //Désactiver les moteurs si plus de commande depuis 2 sec
   if (joystickConnecte && millis() - lastJoystickTime > SPLEEP_TIME) {
     joystickConnecte = false;
     Disable_moteur();
-    return 0;
   }
   
   if (joystickConnecte) {
@@ -262,7 +261,6 @@ int Remote (void){
 
     if (abs(Joy_Y) < LOWEST_PWM && abs(Joy_X) < LOWEST_PWM) {
       Disable_moteur(); 
-      return 0;
     }
 
     Enable_moteur();
@@ -274,7 +272,6 @@ int Remote (void){
     PWM('G', Vg);   
     // Moteur droit
     PWM('D', Vd);
-    return 1;
   }
 }
 
