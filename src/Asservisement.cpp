@@ -44,7 +44,7 @@ int Avancer (int dist_consigne, float KP, float KI, float KD){ //TODO  ajouter u
         commande_pwm_dist_MD =0;
         commande_pwm_dist_MG =0;
         //reset erreur 
-        Reset_pid_distance();
+        //Reset_pid_distance();
         return 1;
     } else {
         return 0;
@@ -124,20 +124,20 @@ int Tourner (int angle, float KP, float KI, float KD){
     D_erreur_rot =  erreur_rot - erreur_rot_prec; 
     erreur_rot_prec = erreur_rot;
     //pid
-    commande_rot = KP * erreur_rot + KI * I_erreur_rot + KD * D_erreur_rot; 
-
+    commande_rot = KP * erreur_rot + KI * I_erreur_rot + KD * D_erreur_rot;
+    
     //cap la valeur max a la vitesse max
     commande_pwm_angle_MD = constrain(abs(commande_rot), LOWEST_PWM, HIGHTEST_PWM) * signe(commande_rot); 
     commande_pwm_angle_MG = - commande_pwm_angle_MD;
     //TODO kick start
 
     //mouvement fini ?
-    if (abs(erreur_rot) < 5 ) {
+    if (abs(erreur_rot) < 1) {
         //PWM a 0
         commande_pwm_angle_MD =0;
         commande_pwm_angle_MG =0;
         //reset erreur 
-        Reset_pid_angle();
+        //Reset_pid_angle();
         return 1;
     } else {
         return 0;

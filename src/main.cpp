@@ -20,14 +20,11 @@ void setup() {
   //Magneto
   Enable_MAG();
 
-  delay(1000); //relax...
+  delay(500); //relax...
 }
 
 int consigne_dist;
 int consigne_angle;
-int consigne_dist_tps, consigne_angle_tps; //TODO changement coordonnées = reset 
-
-static bool rotation_terminee = false;
 
 void loop() {
   server.handleClient(); //rafraichissement handler (server wifi)
@@ -35,18 +32,21 @@ void loop() {
   
   int Commande_MD =0, Commande_MG =0;
   
-  consigne_dist = 1000;
-  consigne_angle = -45;
+  // TODO XY vers arg et module + In cercle/zone + Postion absolue MAJ
+  consigne_dist = 0; 
+  consigne_angle = 90; // sans trigo
 
-  if(!CURVILIGNE && abs(Angle_restriction(consigne_angle *PI/180) - anglerobot)>(5 * PI/180)){ //5 degres de tolerance
-    consigne_dist =0;
+  if(!CURVILIGNE && abs(Angle_restriction(consigne_angle *PI/180) - anglerobot)>(3 * PI/180)){ //5 degres de tolerance
+    commande_pwm_dist_MD =0;
+    commande_pwm_dist_MG =0;
   }
 
-  Tourner(consigne_angle, 2, 1, 0);
+  //FIXME : regler coeff et caper les pid I
+  Tourner(consigne_angle, 1, 1.6, 0);
   Avancer(consigne_dist, 0.2, 0, 0); //Pas fair ca faire une XY en cercle et calculer angle et distance pa rapport a la position actuelle en live , pas de fin de pid, qunad robot dans le cercle => changement de position 
 
-  Commande_MD = constrain(commande_pwm_dist_MD + commande_pwm_angle_MD, -255, 255); //rotation positive
-  Commande_MG = constrain(commande_pwm_dist_MG + commande_pwm_angle_MG, -255, 255); //rotation negative
+  Commande_MD = constrain(commande_pwm_dist_MD + commande_pwm_angle_MD, -HIGHTEST_PWM, HIGHTEST_PWM); //rotation positive
+  Commande_MG = constrain(commande_pwm_dist_MG + commande_pwm_angle_MG, -HIGHTEST_PWM, HIGHTEST_PWM); //rotation negative
 
   PWM('D',Commande_MD);
   PWM('G',Commande_MG);
