@@ -1,18 +1,19 @@
 #include <Arduino.h>
 
+//User Interface (UI)
 #define DEBUG 1
+#define CURVILIGNE 1
 
 // User led
 #define LEDU1 25
 #define LEDU2 26
 
-//moteurs
+//moteurs & roues
 #define LOWEST_PWM 55
-#define SEUIL_TICKS_DECELLERATION 2000
-#define SEUIL_ANGLE_DECELLERATION 45
-
-#define TIC_PAR_ANGLE_T_G -2100/360
-#define TIC_PAR_ANGLE_T_D 2100/360
+#define HIGHTEST_PWM 255
+#define DIAMETRE_ROUE 90
+#define ECART_2_ROUES 80
+#define TICKS_PAR_TOUR_DE_ROUE 2100
 
 // Enable moteurs droit et gauche
 #define EN_D 23
@@ -33,9 +34,9 @@ const int resolution = 8;     // résolution 8 bits (0-255)
 //PID
 extern int commande_pwm_dist_MD, commande_pwm_dist_MG;
 extern int commande_pwm_angle_MD, commande_pwm_angle_MG;
+extern float anglerobot;
 
 //Encodeurs
-#define COEFF_MOTEUR 0.66 // ~255/350 // commande pwm 255 = 255 tour de roue par mini boucle, objectif : exprimer les tiques en proportion du pwm 255 -> 350 ticks X->, permet le calcul de l'erreur et le pid sans faire (pwm = cb de ticks et apres erreur puis re pwm pour le pid)
 // Encodeur droit
 #define ENC_D_CH_A 27
 #define ENC_D_CH_B 14
@@ -58,7 +59,7 @@ extern long nb_tic_encodeur_G;
 #define SPLEEP_TIME 500
 extern WebServer server;
 extern String htmlPage;
-extern int Joy_X, Joy_Y; //sortie du joystick
+extern int Joy_X, Joy_Y; 
 extern bool joystickConnecte;
 extern unsigned long lastJoystickTime;
 extern float radius;
@@ -71,14 +72,11 @@ extern float Ki;
 extern float Kd;
 
 //IMU
-#include "SparkFunLSM6DS3.h" //todo registre = moins d espace gaspiller avec le spi ...
+#include "SparkFunLSM6DS3.h" 
 extern LSM6DS3 myIMU;
 
 //Magneto
 #include <LIS3MDL.h>
-#define CALIBRATION_MAG_X (-773 - 4750)/2
-#define CALIBRATION_MAG_Y (2753 - 2345)/2
-#define CALIBRATION_MAG_Z (3158 - 1612)/2
 extern LIS3MDL mag;
 
 //fonctions.cpp
@@ -112,6 +110,7 @@ int Ticks_to_Distance (int distance);
 int Avancer (int dist_consigne, float KP, float KI, float KD);
 void Reset_pid_distance (void);
 void DEBUG_PID_distance (int consigne_dist);
+float Angle_restriction(float angle);
 float Get_angle();
 int Tourner (int angle, float KP, float KI, float KD);
 void Reset_pid_angle(void);

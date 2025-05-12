@@ -50,7 +50,7 @@ void Enable_PWM(void){
 
 void PWM(char moteur, int DutyCycle){ //pwm >0 = avancer
     boolean Direction = true; 
-    DutyCycle = constrain(DutyCycle, -255, 255);
+    DutyCycle = constrain(DutyCycle, -HIGHTEST_PWM, HIGHTEST_PWM);
     if (DutyCycle <0) { //si pwm negatif alors inversion de la direction 
         Direction = ! Direction;
     }
@@ -115,8 +115,6 @@ void Enable_encodeur(void){
     pinMode(ENC_G_CH_B, INPUT_PULLUP);
     nb_tic_encodeur_D =0;
     nb_tic_encodeur_G =0;
-    //nb_tic_encodeur_D_prec =0;
-    //nb_tic_encodeur_G_prec =0;
     attachInterrupt(digitalPinToInterrupt(ENC_D_CH_A), ENC_ISIR_D, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC_G_CH_A), ENC_ISIR_G, CHANGE);
 }
@@ -326,22 +324,6 @@ float Find_angle (void){
     temps_precedent = temps_actuel;
 
     angle_total_Z += vitesse_Z * duree;
-    
-    //integre si les roues tournent
-    // if (abs(commande_pwm_angle_MD) > 10 || abs(commande_pwm_angle_MG) > 10) {
-    //     angle_total_Z += vitesse_Z * duree;
-    // }else {
-    //     Reset_angle_Z();
-    // }
-
-    // if (abs(nb_tic_encodeur_D)< 10 && abs(nb_tic_encodeur_G) <10 ){//FIXME reset l integrale quand les roues ne tournes pas 
-    //     Reset_angle_Z();
-    // }
-
-    // // Normaliser l'angle entre 0° et 360°
-    // angle_total_Z = fmod(angle_total_Z, 360.0);
-    // if (angle_total_Z < 0) angle_total_Z += 360.0;
-
     return angle_total_Z;
 }
 

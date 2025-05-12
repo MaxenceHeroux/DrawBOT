@@ -6,9 +6,7 @@
 --------------------------------------------------------------------------------*/ 
 
 int Ticks_to_Distance (int distance){
-    int nb_de_ticks_par_roues = 2100;
-    int diametre_roue = 90;
-    float ticks = (distance / (diametre_roue * PI)) * nb_de_ticks_par_roues;
+    float ticks = (distance / (DIAMETRE_ROUE * PI)) * TICKS_PAR_TOUR_DE_ROUE;
     return (int)ticks;
 }
 
@@ -35,14 +33,9 @@ int Avancer (int dist_consigne, float KP, float KI, float KD){ //TODO  ajouter u
     commande_ticks_MG = KP * erreur_dist_G + KI * I_erreur_dist_G + KD * D_erreur_dist_G;
 
     //cap la valeur max a la vitesse max
-    commande_ticks_MD = constrain(commande_ticks_MD, -SEUIL_TICKS_DECELLERATION, SEUIL_TICKS_DECELLERATION); //TODO: Juste contraint = pwm commande cf Tourner
-    commande_ticks_MG = constrain(commande_ticks_MG, -SEUIL_TICKS_DECELLERATION, SEUIL_TICKS_DECELLERATION);
-    // Mapping pour les petites valeurs
-    commande_pwm_dist_MD = map(abs(commande_ticks_MD), 0, SEUIL_TICKS_DECELLERATION, LOWEST_PWM, 255);
-    commande_pwm_dist_MG = map(abs(commande_ticks_MG), 0, SEUIL_TICKS_DECELLERATION, LOWEST_PWM, 255);
-    commande_pwm_dist_MD *= (commande_ticks_MD >= 0) ? 1 : -1;
-    commande_pwm_dist_MG *= (commande_ticks_MG >= 0) ? 1 : -1;
-    
+    commande_pwm_dist_MD = constrain(abs(commande_ticks_MD), LOWEST_PWM, HIGHTEST_PWM) * signe(commande_ticks_MD);
+    commande_pwm_dist_MG = constrain(abs(commande_ticks_MG), LOWEST_PWM, HIGHTEST_PWM) * signe(commande_ticks_MG);  
+
     //TODO kick start
 
     //mouvement fini ?
@@ -70,7 +63,7 @@ void Reset_pid_distance (void){
 }
 
 void DEBUG_PID_distance (int consigne_dist){
-    Serial.print(">etat_atuel_tick_MD:");                //PID consigne
+    Serial.print(">etat_atuel_tick_MD:");               //PID consigne
     Serial.println(nb_tic_encodeur_D);
 
     Serial.print(">Consigne_attendu_tic_D:");           //consigne
@@ -99,24 +92,19 @@ float Angle_restriction(float angle) {
 float anglerobot;
 long nb_tic_encodeur_D_prec =0, nb_tic_encodeur_G_prec =0;
 
-float Get_angle(){ //FIXME 
-    const float ecartRoues = 80.0;        
-    const float distanceParPas = (90.0 * PI) / 2100.0; // mm/pas
-    const float facteurAngle = ecartRoues / distanceParPas;
+float Get_angle(){   
+    const float distanceParPas = (DIAMETRE_ROUE * PI) / TICKS_PAR_TOUR_DE_ROUE;          // mm/pas
+    const float facteurAngle = ECART_2_ROUES / distanceParPas;
 
     long delta_D = nb_tic_encodeur_D - nb_tic_encodeur_D_prec;
     long delta_G = nb_tic_encodeur_G - nb_tic_encodeur_G_prec;
 
-    float deltaAngle = (delta_D - delta_G) / facteurAngle; // en radians
+    float deltaAngle = (delta_D - delta_G) / facteurAngle;      // en radians
     anglerobot += deltaAngle;
     anglerobot = Angle_restriction(anglerobot);
 
     nb_tic_encodeur_D_prec = nb_tic_encodeur_D; 
     nb_tic_encodeur_G_prec = nb_tic_encodeur_G;
-
-    //DEBUG
-    // Serial.print(">Getangle_tick:");
-    // Serial.println(anglerobot * 180.0 / PI);
 
     return anglerobot * 180.0 / PI; //degres
 } 
@@ -131,26 +119,20 @@ int commande_pwm_angle_MD, commande_pwm_angle_MG;
 int Tourner (int angle, float KP, float KI, float KD){ 
     //erreurs
     erreur_rot = angle - Get_angle(); 
- 
     //erreur i et d 
     I_erreur_rot += erreur_rot; //TODO anti wind up
     D_erreur_rot =  erreur_rot - erreur_rot_prec; 
     erreur_rot_prec = erreur_rot;
-    
-
     //pid
     commande_rot = KP * erreur_rot + KI * I_erreur_rot + KD * D_erreur_rot; 
 
     //cap la valeur max a la vitesse max
-    commande_pwm_angle_MD = constrain(abs(commande_rot), LOWEST_PWM, 255) * signe(commande_rot); 
+    commande_pwm_angle_MD = constrain(abs(commande_rot), LOWEST_PWM, HIGHTEST_PWM) * signe(commande_rot); 
     commande_pwm_angle_MG = - commande_pwm_angle_MD;
-   
     //TODO kick start
 
     //mouvement fini ?
     if (abs(erreur_rot) < 5 ) {
-        //Reset le delta angle
-        
         //PWM a 0
         commande_pwm_angle_MD =0;
         commande_pwm_angle_MG =0;
@@ -170,8 +152,11 @@ void Reset_pid_angle(void){
 }
 
 void DEBUG_PID_angle (int consigne_angle){
-    Serial.print(">etat_angle:");                //PID consigne
+    Serial.print(">etat_angle_IMU:");            //PID consigne
     Serial.println(Find_angle());
+
+    Serial.print(">etat_angle_Tick:");           //PID consigne
+    Serial.println(anglerobot* 180.0 / PI);
 
     Serial.print(">Consigne_attendu_angle:");    //consigne
     Serial.println(consigne_angle);
