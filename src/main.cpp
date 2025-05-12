@@ -16,9 +16,11 @@ void setup() {
   //I2C 
   Wire.begin(SDA,SCL);
   //IMU
-  Enable_IMU(); //relax
+  Enable_IMU();
   //Magneto
   Enable_MAG();
+
+  delay(1000); //relax...
 }
 
 int consigne_dist;
@@ -32,29 +34,18 @@ void loop() {
   
   int Commande_MD =0, Commande_MG =0;
 
-  consigne_dist = 300;
+  consigne_dist = 1000;
   consigne_angle = 90;
-  if (!Tourner(consigne_angle,0.1,0,0)) {
-    Commande_MD = commande_pwm_angle_MD;
-    Commande_MG = commande_pwm_angle_MG;
-    rotation_terminee = false;
-    digitalWrite(LEDU1,HIGH);
-    digitalWrite(LEDU2,LOW);
-  }else {
-    if (!rotation_terminee) {
-      nb_tic_encodeur_D = 0;
-      nb_tic_encodeur_G = 0;
-      rotation_terminee = true;
-    }
-    Avancer(consigne_dist,0.3,0,0.01);
-    Commande_MD = commande_pwm_dist_MD;
-    Commande_MG = commande_pwm_dist_MG;
-    digitalWrite(LEDU1,LOW);
-    digitalWrite(LEDU2,HIGH);
-  }
 
-  PWM('D', Commande_MD);
-  PWM('G', Commande_MG);
+  //Tourner & Avancer
+  Tourner(consigne_angle,0.25,0,0);
+  //Avancer(consigne_dist,0.3,0,0.01);
+
+  Commande_MD = constrain(commande_pwm_dist_MD + commande_pwm_angle_MD, -255, 255); //rotation positive
+  Commande_MG = constrain(commande_pwm_dist_MG + commande_pwm_angle_MG, -255, 255); //rotation negative
+
+  PWM('D',Commande_MD);
+  PWM('G',Commande_MG);
 
   if(DEBUG){
     //DEBUG_Blink();
@@ -64,7 +55,7 @@ void loop() {
     // DEBUG_MAG();          //Teleplot
     // DEBUG_angle();        //Teleplot
     // DEBUG_North();        //Teleplot
-     DEBUG_PID_distance(consigne_dist); //Teleplot
-    // DEBUG_PID_angle(consigne_angle);    //Teleplot
+    DEBUG_PID_distance(consigne_dist); //Teleplot
+    DEBUG_PID_angle(consigne_angle);    //Teleplot
   }
 }

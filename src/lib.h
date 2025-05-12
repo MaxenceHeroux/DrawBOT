@@ -7,9 +7,13 @@
 #define LEDU2 26
 
 //moteurs
-#define LOWEST_PWM 50
+#define LOWEST_PWM 55
 #define SEUIL_TICKS_DECELLERATION 2000
 #define SEUIL_ANGLE_DECELLERATION 45
+
+#define TIC_PAR_ANGLE_T_G -2200/360
+#define TIC_PAR_ANGLE_T_D 2200/360
+
 // Enable moteurs droit et gauche
 #define EN_D 23
 #define EN_G 4
@@ -96,6 +100,7 @@ void Remote (void);
 void Enable_IMU (void);
 void DEBUG_IMU (void);
 float Find_angle (void);
+void Reset_angle_Z(void);
 void DEBUG_angle(void);
 void Enable_MAG (void);
 void DEBUG_MAG(void);

@@ -280,7 +280,6 @@ unsigned long temps_precedent = 0;    // Temps de la dernière mesure
 
 LSM6DS3 myIMU;
 void Enable_IMU (void){
-    delay(1000); //relax...
     if (myIMU.begin() != 0) {
         Serial.println("Erreur : LSM6DS3 non détecté !");
     } else {
@@ -320,19 +319,34 @@ void DEBUG_IMU (void){
 
 float Find_angle (void){
     float vitesse_Z = myIMU.readFloatGyroZ();
-    if (abs(vitesse_Z) < 3.5) vitesse_Z = 0; // Filtrage du bruit (dead zone = 3)
+    if (abs(vitesse_Z) < 3.5) vitesse_Z = 0; // Filtrage du bruit (dead zone = 3.5)
 
     unsigned long temps_actuel = millis();
     float duree = (temps_actuel - temps_precedent) / 1000.0; //sec
     temps_precedent = temps_actuel;
 
-    angle_total_Z += vitesse_Z * duree; //integrale de la vitesse angulaire cumulée
+    angle_total_Z += vitesse_Z * duree;
+    
+    //integre si les roues tournent
+    // if (abs(commande_pwm_angle_MD) > 10 || abs(commande_pwm_angle_MG) > 10) {
+    //     angle_total_Z += vitesse_Z * duree;
+    // }else {
+    //     Reset_angle_Z();
+    // }
+
+    // if (abs(nb_tic_encodeur_D)< 10 && abs(nb_tic_encodeur_G) <10 ){//FIXME reset l integrale quand les roues ne tournes pas 
+    //     Reset_angle_Z();
+    // }
 
     // // Normaliser l'angle entre 0° et 360°
     // angle_total_Z = fmod(angle_total_Z, 360.0);
     // if (angle_total_Z < 0) angle_total_Z += 360.0;
 
     return angle_total_Z;
+}
+
+void Reset_angle_Z(void) {
+    angle_total_Z = 0;
 }
 
 void DEBUG_angle(void){
@@ -345,7 +359,7 @@ void Enable_MAG (void){  //calibration : min: { -4750,  -2345,  -1612}   max: { 
     if (!mag.init())
     {
       Serial.println("Erreur : magnetometer non détecté !");
-      while (1);
+      //while (1);
     }else{
         Serial.println("Initialize magnetometer!");
     }
@@ -363,31 +377,14 @@ void DEBUG_MAG(void){
     Serial.println(mag.m.z);    // Affiche mag Z
 }
 
-float max_x = -2043;
-float min_x = -5188;
-float max_y = 2034;
-float min_y = -1327;
-
-float offset_x = (max_x + min_x)/2;
-float offset_y = (max_y + min_y)/2;
-
-float scale_x = (max_x - min_x)/2;
-float scale_y = (max_y - min_y)/2;
-float avg_scale = (scale_x + scale_y)/2;
-
-float cal_x;
-float cal_y;
-
-float Find_north (void){ //TODO calibration 
+float Find_north(void){ //FIXME north programme
     mag.read();
-    float angle;
-    cal_x = (mag.m.x - offset_x) * (avg_scale/scale_x);
-    cal_y = (mag.m.y - offset_y) * (avg_scale/scale_y);
-    angle = atan2(cal_y, cal_x) * 180 / PI;
-    return angle;
+    float heading = atan2(mag.m.y, -mag.m.x) * 180 / PI;
+    if (heading < 0) heading += 360;
+    return heading;
 }
 
-void DEBUG_North (void){ //FIXME north programme
+void DEBUG_North (void){ 
     Serial.print(">North:");
     Serial.println(Find_north());
 }
