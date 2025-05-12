@@ -11,8 +11,8 @@
 #define SEUIL_TICKS_DECELLERATION 2000
 #define SEUIL_ANGLE_DECELLERATION 45
 
-#define TIC_PAR_ANGLE_T_G -2200/360
-#define TIC_PAR_ANGLE_T_D 2200/360
+#define TIC_PAR_ANGLE_T_G -2100/360
+#define TIC_PAR_ANGLE_T_D 2100/360
 
 // Enable moteurs droit et gauche
 #define EN_D 23
@@ -112,7 +112,7 @@ int Ticks_to_Distance (int distance);
 int Avancer (int dist_consigne, float KP, float KI, float KD);
 void Reset_pid_distance (void);
 void DEBUG_PID_distance (int consigne_dist);
-
+float Get_angle();
 int Tourner (int angle, float KP, float KI, float KD);
 void Reset_pid_angle(void);
 void DEBUG_PID_angle (int consigne_angle);

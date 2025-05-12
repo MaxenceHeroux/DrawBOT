@@ -33,6 +33,7 @@ EtatRobot etat_actuel = ETAT_TOURNE;
 
 int consigne_dist;
 int consigne_angle;
+int consigne_dist_tps, consigne_angle_tps;
 
 static bool rotation_terminee = false;
 
@@ -41,51 +42,14 @@ void loop() {
   Remote();
   
   int Commande_MD =0, Commande_MG =0;
-
-  consigne_dist = 1000;
-  consigne_angle = 90;
-
-  //FSM
-  switch (etat_actuel) {
-    case ETAT_TOURNE:
-      if (Tourner(consigne_angle, 0.25, 0, 0)) {
-        commande_pwm_angle_MD = 0;
-        commande_pwm_angle_MG = 0;
-
-        nb_tic_encodeur_D = 0;
-        nb_tic_encodeur_G = 0;
-
-        etat_actuel = ETAT_AVANCE;
-      }
-
-      Commande_MD = commande_pwm_angle_MD;
-      Commande_MG = commande_pwm_angle_MG;
-      break;
-
-    case ETAT_AVANCE:
-      if (Avancer(consigne_dist, 0.3, 0, 0.01)) {
-        commande_pwm_dist_MD = 0;
-        commande_pwm_dist_MG = 0;
-
-        nb_tic_encodeur_D = 0;
-        nb_tic_encodeur_G = 0;
-
-        etat_actuel = ETAT_ARRET;
-      }
-
-      Commande_MD = commande_pwm_dist_MD;
-      Commande_MG = commande_pwm_dist_MG;
-      break;
-
-    case ETAT_ARRET:
-      Commande_MD = 0;
-      Commande_MG = 0;
-      break;
-  }
-
   
-  // Commande_MD = constrain(commande_pwm_dist_MD + commande_pwm_angle_MD, -255, 255); //rotation positive
-  // Commande_MG = constrain(commande_pwm_dist_MG + commande_pwm_angle_MG, -255, 255); //rotation negative
+  consigne_dist = 1000;
+  consigne_angle = -45;
+
+  Tourner(consigne_angle, 2, 1, 0);
+  Avancer(consigne_dist, 0.3, 0, 0.01);
+  Commande_MD = constrain(commande_pwm_dist_MD + commande_pwm_angle_MD, -255, 255); //rotation positive
+  Commande_MG = constrain(commande_pwm_dist_MG + commande_pwm_angle_MG, -255, 255); //rotation negative
 
   PWM('D',Commande_MD);
   PWM('G',Commande_MG);

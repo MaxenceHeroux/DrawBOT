@@ -19,7 +19,7 @@ int erreur_dist_D_prec, erreur_dist_G_prec;
 int commande_ticks_MD, commande_ticks_MG;
 int commande_pwm_dist_MD, commande_pwm_dist_MG;
 
-int Avancer (int dist_consigne, float KP, float KI, float KD){ //TODO  ajouter une rampe 28:06 min  + angle correction 34:05 min 
+int Avancer (int dist_consigne, float KP, float KI, float KD){ //TODO  ajouter une rampe 28:06 min
     //erreurs
     erreur_dist_D = Ticks_to_Distance(dist_consigne) - nb_tic_encodeur_D; 
     erreur_dist_G = Ticks_to_Distance(dist_consigne) - nb_tic_encodeur_G; 
@@ -89,38 +89,68 @@ void DEBUG_PID_distance (int consigne_dist){
     Serial.println(commande_pwm_dist_MG);
 }
 
-int erreur_rot_G, erreur_rot_D;
-int I_erreur_rot_D, I_erreur_rot_G;
-int D_erreur_rot_D, D_erreur_rot_G;
-int erreur_rot_prec_D, erreur_rot_prec_G;
-int commande_rot_D, commande_rot_G;
+
+float Angle_restriction(float angle) {
+    while (angle > PI) angle -= 2 * PI;
+    while (angle < -PI) angle += 2 * PI;
+    return angle;
+}
+
+float anglerobot;
+long nb_tic_encodeur_D_prec =0, nb_tic_encodeur_G_prec =0;
+
+float Get_angle(){ //FIXME 
+    const float ecartRoues = 80.0;        
+    const float distanceParPas = (90.0 * PI) / 2100.0; // mm/pas
+    const float facteurAngle = ecartRoues / distanceParPas;
+
+    long delta_D = nb_tic_encodeur_D - nb_tic_encodeur_D_prec;
+    long delta_G = nb_tic_encodeur_G - nb_tic_encodeur_G_prec;
+
+    float deltaAngle = (delta_D - delta_G) / facteurAngle; // en radians
+    anglerobot += deltaAngle;
+    anglerobot = Angle_restriction(anglerobot);
+
+    nb_tic_encodeur_D_prec = nb_tic_encodeur_D; 
+    nb_tic_encodeur_G_prec = nb_tic_encodeur_G;
+
+    //DEBUG
+    // Serial.print(">Getangle_tick:");
+    // Serial.println(anglerobot * 180.0 / PI);
+
+    return anglerobot * 180.0 / PI; //degres
+} 
+
+int erreur_rot;
+int I_erreur_rot;
+int D_erreur_rot;
+int erreur_rot_prec;
+int commande_rot;
 int commande_pwm_angle_MD, commande_pwm_angle_MG;
 
 int Tourner (int angle, float KP, float KI, float KD){ 
     //erreurs
-    erreur_rot_D = (angle * TIC_PAR_ANGLE_T_G) - nb_tic_encodeur_D;
-    erreur_rot_G = (angle * TIC_PAR_ANGLE_T_D) - nb_tic_encodeur_G;
+    erreur_rot = angle - Get_angle(); 
  
     //erreur i et d 
-    I_erreur_rot_D += erreur_rot_D; //TODO anti wind up
-    I_erreur_rot_G += erreur_rot_G;
-    D_erreur_rot_D =  erreur_rot_D - erreur_rot_prec_D; 
-    D_erreur_rot_G =  erreur_rot_G - erreur_rot_prec_G; 
-    erreur_rot_prec_D = erreur_rot_D;
-    erreur_rot_prec_G = erreur_rot_G;
+    I_erreur_rot += erreur_rot; //TODO anti wind up
+    D_erreur_rot =  erreur_rot - erreur_rot_prec; 
+    erreur_rot_prec = erreur_rot;
+    
 
     //pid
-    commande_rot_D = KP * erreur_rot_D + KI * I_erreur_rot_D + KD * D_erreur_rot_D; 
-    commande_rot_G = KP * erreur_rot_G + KI * I_erreur_rot_G + KD * D_erreur_rot_G;
+    commande_rot = KP * erreur_rot + KI * I_erreur_rot + KD * D_erreur_rot; 
 
     //cap la valeur max a la vitesse max
-    commande_pwm_angle_MD = constrain(abs(commande_rot_D), LOWEST_PWM, 255) * signe(commande_rot_D); 
-    commande_pwm_angle_MG = constrain(abs(commande_rot_G), LOWEST_PWM, 255) * signe(commande_rot_G); 
+    commande_pwm_angle_MD = constrain(abs(commande_rot), LOWEST_PWM, 255) * signe(commande_rot); 
+    commande_pwm_angle_MG = - commande_pwm_angle_MD;
    
     //TODO kick start
 
     //mouvement fini ?
-    if (abs(erreur_rot_D) < 20 && abs(erreur_rot_G) < 20) {
+    if (abs(erreur_rot) < 5 ) {
+        //Reset le delta angle
+        
         //PWM a 0
         commande_pwm_angle_MD =0;
         commande_pwm_angle_MG =0;
@@ -133,10 +163,10 @@ int Tourner (int angle, float KP, float KI, float KD){
 }
 
 void Reset_pid_angle(void){
-    erreur_rot_G, erreur_rot_D =0;
-    I_erreur_rot_D, I_erreur_rot_G =0;
-    D_erreur_rot_D, D_erreur_rot_G =0;
-    erreur_rot_prec_D, erreur_rot_prec_G =0;
+    erreur_rot=0;
+    I_erreur_rot =0;
+    D_erreur_rot =0;
+    erreur_rot_prec =0;
 }
 
 void DEBUG_PID_angle (int consigne_angle){
