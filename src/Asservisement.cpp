@@ -120,7 +120,7 @@ int Tourner (int angle, float KP, float KI, float KD){
     //TODO kick start
 
     //mouvement fini ?
-    if (abs(erreur_rot_D) < 5 && abs(erreur_rot_G) < 5) {
+    if (abs(erreur_rot_D) < 20 && abs(erreur_rot_G) < 20) {
         //PWM a 0
         commande_pwm_angle_MD =0;
         commande_pwm_angle_MG =0;
