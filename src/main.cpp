@@ -23,35 +23,42 @@ void setup() {
   delay(500); //relax...
 }
 
-int consigne_dist;
-int consigne_angle;
+float consigne_dist;
+float consigne_angle;
+
+int consigne_pos_X =0, consigne_pos_Y =0;
+int pos_X =0, pos_Y =0;
 
 void loop() {
   server.handleClient(); //rafraichissement handler (server wifi)
   Remote();
   
   int Commande_MD =0, Commande_MG =0;
+
+  consigne_pos_X = 100; //mm
+  consigne_pos_Y = 100; //mm
+
+  //TODO Actualiser_co (precedent et actuel)
+
+  consigne_dist = sqrt(pow((consigne_pos_X-pos_X),2) + pow((consigne_pos_Y-pos_Y),2)); // ne pas oublier precedent
+  consigne_angle = atan2((consigne_pos_Y-pos_Y),(consigne_pos_X-pos_Y)) * RAD_TO_DEG;
   
-  // TODO XY vers arg et module + In cercle/zone + Postion absolue MAJ
-  consigne_dist = 1000; 
-  consigne_angle = -30; // sans trigo
-
   //FIXME : regler coeff et caper les pid I
-  Tourner(consigne_angle, 1.2, 0, 0); // 1.2, 0.5, 0
-  Avancer(consigne_dist, 0.2, 0, 0); //  0.2, 0, 0 Pas fair ca faire une XY en cercle et calculer angle et distance pa rapport a la position actuelle en live , pas de fin de pid, qunad robot dans le cercle => changement de position 
+  Tourner(consigne_angle, 1.2, 0, 0); 
+  Avancer(consigne_dist, 0.2, 0, 0); // Pas fair ca faire une XY en cercle et calculer angle et distance pa rapport a la position actuelle en live , pas de fin de pid, qunad robot dans le cercle => changement de position 
 
-  // if(!CURVILIGNE && abs(Angle_restriction(consigne_angle *PI/180) - anglerobot)>(3 * PI/180)){ //5 degres de tolerance
-  //   commande_pwm_dist_MD =0;
-  //   commande_pwm_dist_MG =0;
-  // }
+  if(abs(consigne_pos_X-pos_X)<5 && abs(consigne_pos_Y-pos_Y)<5){
+    consigne_pos_X = 0;
+    consigne_pos_Y = 0;
+  }
+
+  if(!CURVILIGNE && abs(Angle_restriction(consigne_angle *PI/180) - anglerobot)>(3 * PI/180)){ //5 degres de tolerance
+    commande_pwm_dist_MD =0;
+    commande_pwm_dist_MG =0;
+  }
 
   Commande_MD = constrain(commande_pwm_dist_MD + commande_pwm_angle_MD, -HIGHTEST_PWM, HIGHTEST_PWM); //rotation positive
   Commande_MG = constrain(commande_pwm_dist_MG + commande_pwm_angle_MG, -HIGHTEST_PWM, HIGHTEST_PWM); //rotation negative
-
-  Serial.print(">commande_pwm_angle_MD:");
-  Serial.print(commande_pwm_angle_MD);
-  Serial.print(">commande_pwm_angle_MG:");
-  Serial.print(commande_pwm_angle_MG);
 
   PWM('D',Commande_MD);
   PWM('G',Commande_MG);

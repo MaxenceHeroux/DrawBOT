@@ -99,6 +99,7 @@ float Get_angle(){
     anglerobot += deltaAngle;
     anglerobot = Angle_restriction(anglerobot);
 
+    Actualiser_co(delta_D, delta_G);
     nb_tic_encodeur_D_prec = nb_tic_encodeur_D; 
     nb_tic_encodeur_G_prec = nb_tic_encodeur_G;
 
@@ -163,4 +164,10 @@ void DEBUG_PID_angle (int consigne_angle){
 
     Serial.print(">Vitesse_moteur_rot_G:");      //vitesse Moteur 
     Serial.println(commande_pwm_angle_MG);
+}
+
+void Actualiser_co (int delta_D, int delta_G){
+    int dist = (delta_D - delta_G)/2;
+    pos_X = pos_X + dist * cos(anglerobot);
+    pos_Y = pos_Y + dist * sin(anglerobot);
 }
