@@ -16,7 +16,7 @@
 #define TICKS_PAR_TOUR_DE_ROUE 2100
 #define DIST_STYLO 132
 
-extern int pos_X , pos_Y;
+extern float pos_X , pos_Y;
 
 // Enable moteurs droit et gauche
 #define EN_D 23

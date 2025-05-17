@@ -12,7 +12,7 @@ int Ticks_to_Distance (int distance){
 
 int Distance_to_Tick (int ticks){
     float dist = (ticks * (DIAMETRE_ROUE * PI)) / TICKS_PAR_TOUR_DE_ROUE;
-    return (int)dist;
+    return dist;
 }
 
 int erreur_dist_D, erreur_dist_G,erreur_dist;
@@ -26,31 +26,18 @@ int Avancer (int dist_consigne, float KP, float KI, float KD){ //TODO  ajouter u
     //erreurs
     erreur_dist_D = Ticks_to_Distance(dist_consigne) - nb_tic_encodeur_D; 
     erreur_dist_G = Ticks_to_Distance(dist_consigne) - nb_tic_encodeur_G; 
-    erreur_dist = (erreur_dist_D-erreur_dist_G)/2;
+    erreur_dist = (erreur_dist_D + erreur_dist_G)/2;
     //erreur i et d
     I_erreur_dist += erreur_dist;
     D_erreur_dist =  erreur_dist - erreur_dist_prec;
     erreur_dist_prec = erreur_dist;
     //pid
-    commande_ticks = KP * erreur_dist_D + KI * I_erreur_dist + KD * D_erreur_dist;
+    commande_ticks = KP * erreur_dist + KI * I_erreur_dist + KD * D_erreur_dist;
     
     //cap la valeur max a la vitesse max
     commande_pwm_dist_MD = constrain(abs(commande_ticks), 0, HIGHTEST_PWM) * signe(commande_ticks);
     commande_pwm_dist_MG = constrain(abs(commande_ticks), 0, HIGHTEST_PWM) * signe(commande_ticks);  
 
-    //TODO kick start
-
-    //mouvement fini ?
-    // if (abs(erreur_dist_D) < 20 && abs(erreur_dist_G) < 20) {
-    //     //PWM a 0
-    //     commande_pwm_dist_MD =0;
-    //     commande_pwm_dist_MG =0;
-    //     //reset erreur 
-    //     //Reset_pid_distance();
-    //     return 1;
-    // } else {
-    //     return 0;
-    // }
     return 0;
 }
 
@@ -134,17 +121,6 @@ int Tourner (int angle, float KP, float KI, float KD){
     commande_pwm_angle_MG = - commande_pwm_angle_MD;
     //TODO kick start
 
-    //mouvement fini ?
-    // if (abs(erreur_rot) < 1) {
-    //     //PWM a 0
-    //     commande_pwm_angle_MD =0;
-    //     commande_pwm_angle_MG =0;
-    //     //reset erreur 
-    //     //Reset_pid_angle();
-    //     return 1;
-    // } else {
-    //     return 0;
-    // }
     return 0;
 }
 

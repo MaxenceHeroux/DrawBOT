@@ -110,7 +110,7 @@ long nb_tic_encodeur_D;
 long nb_tic_encodeur_G;
 void Enable_encodeur(void){
     pinMode(ENC_D_CH_A, INPUT_PULLUP);
-    pinMode(ENC_D_CH_A, INPUT_PULLUP);
+    pinMode(ENC_D_CH_B, INPUT_PULLUP);
     pinMode(ENC_G_CH_A, INPUT_PULLUP);
     pinMode(ENC_G_CH_B, INPUT_PULLUP);
     nb_tic_encodeur_D =0;

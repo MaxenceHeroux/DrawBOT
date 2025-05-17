@@ -3,8 +3,8 @@
 float consigne_dist;
 float consigne_angle;
 
-int consigne_pos_X =0, consigne_pos_Y =0;
-int pos_X =0, pos_Y =0;
+float consigne_pos_X =0, consigne_pos_Y =0;
+float pos_X =0, pos_Y =0;
 
 struct Coord {
   int x;
@@ -55,12 +55,15 @@ void loop() {
 
   //TODO Actualiser_co (precedent et actuel)
 
-  consigne_dist = sqrt(pow((consigne_pos_X-pos_X),2) + pow((consigne_pos_Y-pos_Y),2)) * signe(consigne_pos_X-pos_X); //consigne negative ? 
+  consigne_pos_X = 1000;
+  consigne_pos_Y = 0;
+
+  consigne_dist = sqrt(pow((consigne_pos_X-pos_X),2) + pow((consigne_pos_Y-pos_Y),2));
   consigne_angle = atan2((consigne_pos_Y-pos_Y),(consigne_pos_X-pos_X)) * RAD_TO_DEG;
-  
+
   //FIXME : regler coeff et caper les pid I
-  Tourner(consigne_angle, 1.2, 0, 0); 
-  Avancer(consigne_dist, 0.2, 0, 0); // Pas fair ca faire une XY en cercle et calculer angle et distance pa rapport a la position actuelle en live , pas de fin de pid, qunad robot dans le cercle => changement de position 
+  Tourner(consigne_angle, 5, 0.02, 0); 
+  Avancer(consigne_dist, 0.2, 0, 0);  
 
   Serial.print(">posX:");
   Serial.println(pos_X);
@@ -74,18 +77,20 @@ void loop() {
   Serial.println(consigne_dist);
   Serial.print(">consigneangle:");
   Serial.println(consigne_angle);
+  Serial.print(">anglerobot:");
+  Serial.println(anglerobot * RAD_TO_DEG);
 
-  if(abs(consigne_pos_X-pos_X)<50 ){ // && abs(consigne_pos_Y-pos_Y)<50
-    digitalWrite(LEDU1,HIGH);
-    delay(1000);
-    digitalWrite(LEDU1,LOW);
-    i++;
-    if(i>=4){
-      i=0;
-    }
-    consigne_pos_X = carre[i].x; //mm
-    consigne_pos_Y = carre[i].y;
-  }
+  // if(abs(consigne_pos_X-pos_X)<50 ){ // && abs(consigne_pos_Y-pos_Y)<50
+  //   digitalWrite(LEDU1,HIGH);
+  //   delay(1000);
+  //   digitalWrite(LEDU1,LOW);
+  //   i++;
+  //   if(i>=4){
+  //     i=0;
+  //   }
+  //   consigne_pos_X = carre[i].x; //mm
+  //   consigne_pos_Y = carre[i].y;
+  // }
 
   if(!CURVILIGNE && abs(Angle_restriction(consigne_angle *PI/180) - anglerobot)>(3 * PI/180)){ //5 degres de tolerance
     commande_pwm_dist_MD =0;
