@@ -110,6 +110,7 @@ void DEBUG_North (void);
 
 //Asservissement.cpp
 int Ticks_to_Distance (int distance);
+int Distance_to_Tick (int ticks);
 int Avancer (int dist_consigne, float KP, float KI, float KD);
 void Reset_pid_distance (void);
 void DEBUG_PID_distance (int consigne_dist);

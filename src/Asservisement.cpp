@@ -10,6 +10,11 @@ int Ticks_to_Distance (int distance){
     return (int)ticks;
 }
 
+int Distance_to_Tick (int ticks){
+    float dist = (ticks * (DIAMETRE_ROUE * PI)) / TICKS_PAR_TOUR_DE_ROUE;
+    return (int)dist;
+}
+
 int erreur_dist_D, erreur_dist_G,erreur_dist;
 int I_erreur_dist;
 int D_erreur_dist;
@@ -100,6 +105,7 @@ float Get_angle(){
     anglerobot = Angle_restriction(anglerobot);
 
     Actualiser_co(delta_D, delta_G);
+
     nb_tic_encodeur_D_prec = nb_tic_encodeur_D; 
     nb_tic_encodeur_G_prec = nb_tic_encodeur_G;
 
@@ -167,7 +173,7 @@ void DEBUG_PID_angle (int consigne_angle){
 }
 
 void Actualiser_co (int delta_D, int delta_G){
-    int dist = (delta_D - delta_G)/2;
-    pos_X = pos_X + dist * cos(anglerobot);
-    pos_Y = pos_Y + dist * sin(anglerobot);
+    float dist = Distance_to_Tick((delta_D + delta_G)/2);
+    pos_X += (dist * cos(anglerobot));
+    pos_Y += (dist * sin(anglerobot));
 }
