@@ -21,17 +21,17 @@ int Avancer (int dist_consigne, float KP, float KI, float KD){ //TODO  ajouter u
     //erreurs
     erreur_dist_D = Ticks_to_Distance(dist_consigne) - nb_tic_encodeur_D; 
     erreur_dist_G = Ticks_to_Distance(dist_consigne) - nb_tic_encodeur_G; 
-    erreur_dist = (erreur_dist_D-erreur_dist_G)/2;
+    erreur_dist = (erreur_dist_D+erreur_dist_G)/2;
     //erreur i et d
     I_erreur_dist += erreur_dist;
     D_erreur_dist =  erreur_dist - erreur_dist_prec;
     erreur_dist_prec = erreur_dist;
     //pid
-    commande_ticks = KP * erreur_dist_D + KI * I_erreur_dist + KD * D_erreur_dist;
+    commande_ticks = KP * erreur_dist + KI * I_erreur_dist + KD * D_erreur_dist;
     
     //cap la valeur max a la vitesse max
-    commande_pwm_dist_MD = constrain(abs(commande_ticks), 0, HIGHTEST_PWM) * signe(commande_ticks);
-    commande_pwm_dist_MG = constrain(abs(commande_ticks), 0, HIGHTEST_PWM) * signe(commande_ticks);  
+    commande_pwm_dist_MD = constrain(abs(commande_ticks), 0, HIGHTEST_PWM-100) * signe(commande_ticks);
+    commande_pwm_dist_MG = constrain(abs(commande_ticks), 0, HIGHTEST_PWM-100) * signe(commande_ticks);  
 
     //TODO kick start
 

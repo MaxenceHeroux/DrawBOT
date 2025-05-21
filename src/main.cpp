@@ -20,7 +20,7 @@ void setup() {
   //Magneto
   Enable_MAG();
 
-  delay(500); //relax...
+  //delay(500); //relax...
 }
 
 int consigne_dist;
@@ -33,17 +33,17 @@ void loop() {
   int Commande_MD =0, Commande_MG =0;
   
   // TODO XY vers arg et module + In cercle/zone + Postion absolue MAJ
-  consigne_dist = 1000; 
-  consigne_angle = -30; // sans trigo
+  consigne_dist = 800; 
+  consigne_angle = 45; // sans trigo
 
   //FIXME : regler coeff et caper les pid I
-  Tourner(consigne_angle, 1.2, 0, 0); // 1.2, 0.5, 0
+  Tourner(consigne_angle, 5, 0, 0); // 1.2, 0.5, 0
   Avancer(consigne_dist, 0.2, 0, 0); //  0.2, 0, 0 Pas fair ca faire une XY en cercle et calculer angle et distance pa rapport a la position actuelle en live , pas de fin de pid, qunad robot dans le cercle => changement de position 
 
-  // if(!CURVILIGNE && abs(Angle_restriction(consigne_angle *PI/180) - anglerobot)>(3 * PI/180)){ //5 degres de tolerance
-  //   commande_pwm_dist_MD =0;
-  //   commande_pwm_dist_MG =0;
-  // }
+  if(!CURVILIGNE && abs(Angle_restriction(consigne_angle *PI/180) - anglerobot)>(3 * PI/180)){ //5 degres de tolerance
+    commande_pwm_dist_MD =0;
+    commande_pwm_dist_MG =0;
+  }
 
   Commande_MD = constrain(commande_pwm_dist_MD + commande_pwm_angle_MD, -HIGHTEST_PWM, HIGHTEST_PWM); //rotation positive
   Commande_MG = constrain(commande_pwm_dist_MG + commande_pwm_angle_MG, -HIGHTEST_PWM, HIGHTEST_PWM); //rotation negative
