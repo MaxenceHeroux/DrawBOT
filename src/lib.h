@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 //User Interface (UI)
-#define DEBUG 1
+#define DEBUG 0
 #define CURVILIGNE 1
 
 // User led
@@ -14,6 +14,9 @@
 #define DIAMETRE_ROUE 90
 #define ECART_2_ROUES 80
 #define TICKS_PAR_TOUR_DE_ROUE 2100
+#define DIST_STYLO 132
+
+extern float pos_X , pos_Y;
 
 // Enable moteurs droit et gauche
 #define EN_D 23
@@ -115,3 +118,4 @@ float Get_angle();
 int Tourner (int angle, float KP, float KI, float KD);
 void Reset_pid_angle(void);
 void DEBUG_PID_angle (int consigne_angle);
+void Actualiser_co (int delta_D, int delta_G);
