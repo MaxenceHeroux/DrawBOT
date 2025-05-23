@@ -110,7 +110,7 @@ void DEBUG_North (void);
 
 //Asservissement.cpp
 int Ticks_to_Distance (int distance);
-int Avancer (int dist_consigne, float KP, float KI, float KD);
+int Avancer(int dist_consige, float KP, float KI, float KD);
 void Reset_pid_distance (void);
 void DEBUG_PID_distance (int consigne_dist);
 float Angle_restriction(float angle);
@@ -119,3 +119,4 @@ int Tourner (int angle, float KP, float KI, float KD);
 void Reset_pid_angle(void);
 void DEBUG_PID_angle (int consigne_angle);
 void Actualiser_co (int delta_D, int delta_G);
+
