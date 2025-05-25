@@ -35,13 +35,16 @@ void loop() {
   
   int Commande_MD =0, Commande_MG =0;
 
-  if(abs(consigne_dist) <10 ){ //&& abs(consigne_angle) <10
+  if(abs(consigne_dist) <5){ //&& abs(consigne_angle) <10
     i++;
     digitalWrite(LEDU1, HIGH);
 
-    Discretiser(30, i); //modifie les consignes
-    // consigne_pos_X +=100;
-    // consigne_pos_Y +=100;
+    Discretiser(50, 20, i); //modifie les consignes
+
+    if(i==20) i=20;
+
+    Reset_pid_distance();
+    Reset_pid_angle();
 
     PWM('D',0);
     PWM('G',0);
@@ -49,14 +52,20 @@ void loop() {
     digitalWrite(LEDU1, LOW);
   }
 
-  consigne_dist = sqrt(pow((consigne_pos_X-pos_X),2) + pow((consigne_pos_Y-pos_Y),2)) -DIST_STYLO; 
+  consigne_dist = sqrt(pow((consigne_pos_X-pos_X),2) + pow((consigne_pos_Y-pos_Y),2)) - DIST_STYLO; 
   consigne_angle = atan2((consigne_pos_Y-pos_Y),(consigne_pos_X-pos_X)) * RAD_TO_DEG;
 
   Get_angle();
-  Tourner(consigne_angle, 5, 0, 0);   //FIXME : regler coeff et caper les pid I
-  Avancer(consigne_dist, 2,0, 0.5); 
   
-  delay(15); //attention a ne pas retirer !
+  //PID sol
+  // Tourner(consigne_angle, 5, 0, 0);   //FIXME : regler coeff et caper les pid I
+  // Avancer(consigne_dist, 1,0, 0.05);
+  
+  //PID ardoise
+  Tourner(consigne_angle, 5, 0.02, 0);   //FIXME : regler coeff et caper les pid I
+  Avancer(consigne_dist, 2,0.1,0.5); 
+  
+  delay(10); //attention a ne pas retirer !
 
   if(!CURVILIGNE && abs(Angle_restriction(consigne_angle *PI/180) - anglerobot)>(3 * PI/180)){ //5 degres de tolerance
     commande_pwm_dist_MD =0;

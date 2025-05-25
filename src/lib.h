@@ -38,6 +38,7 @@ const int resolution = 8;     // résolution 8 bits (0-255)
 extern int commande_pwm_dist_MD, commande_pwm_dist_MG;
 extern int commande_pwm_angle_MD, commande_pwm_angle_MG;
 extern float anglerobot;
+extern float consigne_pos_X, consigne_pos_Y;
 
 //Encodeurs
 // Encodeur droit
@@ -119,6 +120,4 @@ int Tourner (int angle, float KP, float KI, float KD);
 void Reset_pid_angle(void);
 void DEBUG_PID_angle (int consigne_angle);
 void Actualiser_co (int delta_D, int delta_G);
-
-void Discretiser(int nb_de_point, int i);
-extern float consigne_pos_X, consigne_pos_Y;
+void Discretiser(int rayon, int nb_de_point, int i);

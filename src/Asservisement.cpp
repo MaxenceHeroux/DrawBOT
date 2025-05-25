@@ -109,7 +109,8 @@ int commande_pwm_angle_MD, commande_pwm_angle_MG;
 
 int Tourner (int angle, float KP, float KI, float KD){ 
     //erreurs
-    erreur_rot = angle - anglerobot * RAD_TO_DEG; 
+    erreur_rot = Angle_restriction((angle * DEG_TO_RAD) - anglerobot) * RAD_TO_DEG; //angle - anglerobot * RAD_TO_DEG; 
+
     //erreur i et d 
     I_erreur_rot += erreur_rot; //TODO anti wind up
     D_erreur_rot =  erreur_rot - erreur_rot_prec; 
@@ -155,12 +156,8 @@ void Actualiser_co (int delta_D, int delta_G){
     pos_Y += (dist * sin(anglerobot));
 }
 
-void Discretiser(int nb_de_point, int i){
+void Discretiser(int rayon, int nb_de_point, int i){
     float angle = 2*PI*(i/(float)nb_de_point);
-    consigne_pos_X += 50 * cos(angle);
-    consigne_pos_Y += 50 * sin(angle);
-    Serial.print(">angle_rond:");
-    Serial.println(angle);
-    Serial.print(">i:");
-    Serial.println(i);
+    consigne_pos_X = -(rayon * cos(angle) -rayon);
+    consigne_pos_Y = rayon * sin(angle);
 }
