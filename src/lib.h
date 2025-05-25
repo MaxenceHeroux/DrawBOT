@@ -66,13 +66,16 @@ extern int Joy_X, Joy_Y;
 extern bool joystickConnecte;
 extern unsigned long lastJoystickTime;
 extern float radius;
-extern float xOrigin;
-extern float yOrigin;
-extern int windrose;
-extern int escalier_options;
-extern float Kp;
-extern float Ki;
-extern float Kd;
+extern float nbPoint;
+extern int mode;
+extern int nbCarre;
+extern int coteCarre;
+extern float Kp_ang;
+extern float Ki_ang;
+extern float Kd_ang;
+extern float Kp_dist;
+extern float Ki_dist;
+extern float Kd_dist;
 
 //IMU
 #include "SparkFunLSM6DS3.h" 
@@ -120,5 +123,5 @@ void Reset_pid_angle(void);
 void DEBUG_PID_angle (int consigne_angle);
 void Actualiser_co (int delta_D, int delta_G);
 
-void Discretiser(int nb_de_point, int i);
+void Discretiser(int nb_de_point, int i, int mode);
 extern float consigne_pos_X, consigne_pos_Y;

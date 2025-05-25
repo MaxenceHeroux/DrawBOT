@@ -39,7 +39,7 @@ void loop() {
     i++;
     digitalWrite(LEDU1, HIGH);
 
-    Discretiser(30, i); //modifie les consignes
+    Discretiser(30, i, mode); //modifie les consignes
     // consigne_pos_X +=100;
     // consigne_pos_Y +=100;
 
