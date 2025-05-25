@@ -198,18 +198,22 @@ String htmlPage = R"rawliteral(
       background-color: rgba(0, 0, 0, 0.5);
       z-index: 999;
     }
+    #Joy{
+      display: none;
+    }
   </style>
 </head>
 <body>
   <h1>ESP32 - DrawBOT</h1>
+  <div id="Joy">
+    <div id="joystickZone">
+      <div id="stick"></div>
+    </div>
 
-  <div id="joystickZone">
-    <div id="stick"></div>
-  </div>
-
-  <div id="values">
-    X: <span id="xVal">0</span> |
-    Y: <span id="yVal">0</span>
+    <div id="values" style="text-align: center;">
+      X: <span id="xVal">0</span> |
+      Y: <span id="yVal">0</span>
+    </div>
   </div>
 
   <h2><b>Options DrawBOT</b></h2>
@@ -219,6 +223,7 @@ String htmlPage = R"rawliteral(
     <button onclick="openCircleModal()">Cercle</button>
     <button onclick="openRoseModal()">Rose des Vents</button>
     <button onclick="openDebugModal()">Debug</button>
+    <button onclick="toogleJoy()">Joystik On/Off</button>
   </div>
 
   <!-- Overlay -->
@@ -443,6 +448,15 @@ String htmlPage = R"rawliteral(
       closeRoseModal();
       closeEscalierModal();
     });
+
+    function toogleJoy(){
+      const joyDiv = document.getElementById("Joy");
+      if (joyDiv.style.display === "none") {
+        joyDiv.style.display = "block"; // Affiche la div
+      } else {
+        joyDiv.style.display = "none"; // Cache la div
+      }      
+    }
   </script>
 </body>
 </html>
