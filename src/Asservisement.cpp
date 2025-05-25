@@ -36,8 +36,8 @@ int Avancer(int dist_consige, float KP, float KI, float KD){ //TODO  ajouter une
     commande_ticks = KP * erreur_dist + KI * I_erreur_dist + KD * D_erreur_dist;
     
     //cap la valeur max a la vitesse max
-    commande_pwm_dist_MD = constrain(abs(commande_ticks), 0, HIGHTEST_PWM-100) * signe(commande_ticks);
-    commande_pwm_dist_MG = constrain(abs(commande_ticks), 0, HIGHTEST_PWM-100) * signe(commande_ticks);  
+    commande_pwm_dist_MD = constrain(abs(commande_ticks), 0, HIGHTEST_PWM-50) * signe(commande_ticks); //TODO -max angle
+    commande_pwm_dist_MG = constrain(abs(commande_ticks), 0, HIGHTEST_PWM-50) * signe(commande_ticks);  
 
     //TODO kick start
 
@@ -153,4 +153,14 @@ void Actualiser_co (int delta_D, int delta_G){
     float dist = Distance_to_Tick((delta_D + delta_G)/2);
     pos_X += (dist * cos(anglerobot));
     pos_Y += (dist * sin(anglerobot));
+}
+
+void Discretiser(int nb_de_point, int i){
+    float angle = 2*PI*(i/(float)nb_de_point);
+    consigne_pos_X += 50 * cos(angle);
+    consigne_pos_Y += 50 * sin(angle);
+    Serial.print(">angle_rond:");
+    Serial.println(angle);
+    Serial.print(">i:");
+    Serial.println(i);
 }

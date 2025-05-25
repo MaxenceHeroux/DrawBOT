@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 //User Interface (UI)
-#define DEBUG 0
+#define DEBUG 1
 #define CURVILIGNE 1
 
 // User led
@@ -120,3 +120,5 @@ void Reset_pid_angle(void);
 void DEBUG_PID_angle (int consigne_angle);
 void Actualiser_co (int delta_D, int delta_G);
 
+void Discretiser(int nb_de_point, int i);
+extern float consigne_pos_X, consigne_pos_Y;

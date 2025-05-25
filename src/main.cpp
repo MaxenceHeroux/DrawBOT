@@ -19,15 +19,15 @@ void setup() {
   Enable_IMU();
   //Magneto
   Enable_MAG();
-
-  //delay(500); //relax...
 }
 
 int consigne_dist;
 int consigne_angle;
 
 float consigne_pos_X =0, consigne_pos_Y =0;
-float pos_X =0, pos_Y =0;
+float pos_X =-DIST_STYLO, pos_Y =0; 
+
+int i =0;
 
 void loop() {
   server.handleClient(); //rafraichissement handler (server wifi)
@@ -35,19 +35,26 @@ void loop() {
   
   int Commande_MD =0, Commande_MG =0;
 
-  consigne_pos_X = 000;
-  consigne_pos_Y = 1000;
+  if(abs(consigne_dist) <10 ){ //&& abs(consigne_angle) <10
+    i++;
+    digitalWrite(LEDU1, HIGH);
 
-  consigne_dist = sqrt(pow((consigne_pos_X-pos_X),2) + pow((consigne_pos_Y-pos_Y),2));
+    Discretiser(30, i); //modifie les consignes
+    // consigne_pos_X +=100;
+    // consigne_pos_Y +=100;
+
+    PWM('D',0);
+    PWM('G',0);
+    delay(500);
+    digitalWrite(LEDU1, LOW);
+  }
+
+  consigne_dist = sqrt(pow((consigne_pos_X-pos_X),2) + pow((consigne_pos_Y-pos_Y),2)) -DIST_STYLO; 
   consigne_angle = atan2((consigne_pos_Y-pos_Y),(consigne_pos_X-pos_X)) * RAD_TO_DEG;
-  
-  // TODO XY vers arg et module + In cercle/zone + Postion absolue MAJ
-  // consigne_dist = 800; 
-  // consigne_angle = 45; // sans trigo
- 
+
   Get_angle();
   Tourner(consigne_angle, 5, 0, 0);   //FIXME : regler coeff et caper les pid I
-  Avancer(consigne_dist, 0.2, 0, 0); 
+  Avancer(consigne_dist, 2,0, 0.5); 
   
   delay(15); //attention a ne pas retirer !
 
@@ -62,7 +69,7 @@ void loop() {
   PWM('D',Commande_MD);
   PWM('G',Commande_MG);
 
-  if(DEBUG){
+  if(DEBUG){ //TODO "ifdef etc"
     // DEBUG_Blink();
     // DEBUG_pwm();
     // DEBUG_encodeur();     //Teleplot
@@ -70,7 +77,24 @@ void loop() {
     // DEBUG_MAG();          //Teleplot
     // DEBUG_angle();        //Teleplot
     // DEBUG_North();        //Teleplot
-    DEBUG_PID_distance(consigne_dist); //Teleplot
-    DEBUG_PID_angle(consigne_angle);    //Teleplot
+    // DEBUG_PID_distance(consigne_dist);  //Teleplot
+    // DEBUG_PID_angle(consigne_angle);    //Teleplot
+
+    Serial.print(">posx:");
+    Serial.println(pos_X);
+    Serial.print(">posy:");
+    Serial.println(pos_Y);
+    Serial.print(">consigne_pox:");
+    Serial.println(consigne_pos_X);
+    Serial.print(">consigne_poy:");
+    Serial.println(consigne_pos_Y);
+
+    Serial.print(">distance:");
+    Serial.println(consigne_dist);
+
+    Serial.print(">consigneangle:");
+    Serial.println(consigne_angle);
+    Serial.print(">angle:");
+    Serial.println(anglerobot);
   }
 }
