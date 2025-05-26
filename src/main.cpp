@@ -38,10 +38,9 @@ void loop() {
   if(abs(consigne_dist) <5){ //&& abs(consigne_angle) <10
     i++;
     digitalWrite(LEDU1, HIGH);
-
-    Discretiser(50, 20, i); //modifie les consignes
-
-    if(i==20) i=20;
+    
+    if(i>=20) i=20;
+    Discretiser(50, 20, i); //modifie les consignes    
 
     Reset_pid_distance();
     Reset_pid_angle();
