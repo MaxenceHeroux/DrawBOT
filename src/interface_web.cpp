@@ -223,7 +223,7 @@ String htmlPage = R"rawliteral(
     <button onclick="openCircleModal()">Cercle</button>
     <button onclick="openRoseModal()">Rose des Vents</button>
     <button onclick="openDebugModal()">Debug</button>
-    <button onclick="toogleJoy()">Joystik On/Off</button>
+    <button onclick="toggleJoy()">Joystick On/Off</button>
   </div>
 
   <!-- Overlay -->
@@ -450,7 +450,7 @@ String htmlPage = R"rawliteral(
       closeEscalierModal();
     });
 
-    function toogleJoy(){
+    function toggleJoy(){
       const joyDiv = document.getElementById("Joy");
       if (joyDiv.style.display === "none") {
         joyDiv.style.display = "block"; // Affiche la div
