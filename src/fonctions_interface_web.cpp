@@ -135,3 +135,29 @@ void Enable_wifi(void){
     server.begin();
     Serial.println("Serveur HTTP lancé.");
 }
+
+void Remote (void){
+    //Désactiver les moteurs si plus de commande depuis 2 sec
+  if (joystickConnecte && millis() - lastJoystickTime > SPLEEP_TIME) {
+    joystickConnecte = false;
+    Disable_moteur();
+  }
+  
+  if (joystickConnecte) {
+    int Vg = 0, Vd = 0;
+
+    if (abs(Joy_Y) < LOWEST_PWM && abs(Joy_X) < LOWEST_PWM) {
+      Disable_moteur(); 
+    }
+
+    Enable_moteur();
+    // Calcul des vitesses
+    Vg = constrain(-Joy_Y + Joy_X, -255, 255);
+    Vd = constrain(-Joy_Y - Joy_X, -255, 255);
+
+    // Moteur gauche
+    PWM('G', Vg);   
+    // Moteur droit
+    PWM('D', Vd);
+  }
+}
