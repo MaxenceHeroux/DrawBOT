@@ -338,6 +338,7 @@ String htmlPage = R"rawliteral(
       fetch(`/joy?x=0&y=0`).catch((e) => {});
     });
 
+    //Escalier
     function sendSequence(seq) { //seq = multiCarre ou step
       const nb_carre = document.getElementById("escalierNb").value;
       const coter = document.getElementById("escalierCote").value;
@@ -374,7 +375,7 @@ String htmlPage = R"rawliteral(
       const r = document.getElementById("circleRadius").value;
       const points = document.getElementById("circlePoints").value;
       const rosace = document.getElementById("circleRosace").checked ? 1 : 0;
-      const type = "nope";
+      let type ;
       if(rosace){
          type = "Rosace"; 
       } else{

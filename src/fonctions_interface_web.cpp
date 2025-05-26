@@ -40,7 +40,7 @@ void handleCircle(void) {
     nbPoint = server.arg("points").toFloat();
 
     if (DEBUG) {
-        Serial.printf("Cercle reçu : rayon=%.2f, nombre de points=%.2f\n", radius, nbPoint);
+        Serial.printf("Cercle reçu : rayon=%.2f, nombre de points=%.2f et mode :%d\n", radius, nbPoint, mode);
     }
 
     server.send(200, "text/plain", "Cercle OK");
@@ -77,6 +77,7 @@ void handleSequence(void) {
 
 
   if (DEBUG) {
+    Serial.printf("Nombre de carré : %d, cote du plus grand carre = %d\n.", nbCarre, coteCarre);
     Serial.print("Séquence sélectionnée : ");
     Serial.println(mode);
   }
