@@ -156,29 +156,33 @@ void Actualiser_co (int delta_D, int delta_G){
     pos_Y += (dist * sin(anglerobot));
 }
 
-void Discretiser(int nb_de_point, int i, int mode){
-    if (mode == 1){ //Escalier
-
-    }
-    else if(mode == 2){ //Carré dans carré etc
-        
-    }
-    else if(mode == 3){ //Cercle
-        float angle = 2*PI*(i/(float)nb_de_point);
-        consigne_pos_X += 50 * cos(angle);
-        consigne_pos_Y += 50 * sin(angle);
-        Serial.print(">angle_rond:");
-        Serial.println(angle);
-        Serial.print(">i:");
-        Serial.println(i);
-    }
-    else if(mode == 4){ //Rosace
-
-    }
-    else if(mode == 5){ //Rose des vents
-
-    }
-    else if(mode == 6){ //Flêche
-
+void Discretiser(){
+    switch (mode){
+        case 1:{  //Escalier
+            break;
+        }
+        case 2:{  //Carré dans carré etc
+            break;
+        } 
+        case 3:{  //Cercle
+            if(i>=nbPoint) i=nbPoint;
+            float angle = 2*PI*(i/(float)nbPoint);
+            consigne_pos_X += radius * cos(angle);
+            consigne_pos_Y += radius * sin(angle);
+            break;
+        }
+        case 4:{  //Rosace
+            break;
+        } 
+        case 5:{  //Rose des vents
+            break;
+        } 
+        case 6:{  //Flêche
+            break;
+        } 
+        default:{
+            i =0;
+            break;
+        }
     }
 }

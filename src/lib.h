@@ -123,7 +123,6 @@ int Tourner (int angle, float KP, float KI, float KD);
 void Reset_pid_angle(void);
 void DEBUG_PID_angle (int consigne_angle);
 void Actualiser_co (int delta_D, int delta_G);
-void Discretiser(int rayon, int nb_de_point, int i);
-
-void Discretiser(int nb_de_point, int i, int mode);
+void Discretiser();
 extern float consigne_pos_X, consigne_pos_Y;
+extern int i;

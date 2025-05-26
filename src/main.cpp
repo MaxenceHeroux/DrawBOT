@@ -40,7 +40,7 @@ void loop() {
     digitalWrite(LEDU1, HIGH);
     
     if(i>=20) i=20;
-    Discretiser(50, 20, i); //modifie les consignes    
+    Discretiser(); // modifie les consignes    
 
     Reset_pid_distance();
     Reset_pid_angle();

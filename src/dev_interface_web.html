@@ -342,6 +342,15 @@
 
     function sendRoseSequence(seq) {
       fetch(`/rose?type=${seq}`).catch((e) => {});
+
+      fetch(`/rose?type=${seq}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Erreur HTTP : " + res.status);
+          return res.text();
+        })
+        .then((text) => console.log("Réponse du serveur :", text))
+        .catch((e) => console.error("Erreur fetch :", e));
+        
     }
 
     // Modales open/close
@@ -376,7 +385,14 @@
          type = "Circle"; 
       }
 
-      fetch(`/circle?radius=${r}&points=${points}&type=${type}`).catch((e) => {});
+      fetch(`/circle?radius=${r}&points=${points}&type=${type}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Erreur HTTP : " + res.status);
+          return res.text();
+        })
+        .then((text) => console.log("Réponse du serveur :", text))
+        .catch((e) => console.error("Erreur fetch :", e));
+
       closeCircleModal();
     }
 
