@@ -176,6 +176,9 @@ void Discretiser(){
         } 
         case 5:{  //Rose des vents
             break;
+
+
+            
         } 
         case 6:{  //Flêche
             break;

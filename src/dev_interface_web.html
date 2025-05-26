@@ -336,13 +336,21 @@
     function sendSequence(seq) { //seq = multiCarre ou step
       const nb_carre = document.getElementById("escalierNb").value;
       const coter = document.getElementById("escalierCote").value;
-      fetch(`/sequence?type=${seq}&nb_carre=${nb_carre}&coter=${coter}`).catch((e) => {});
+
+      fetch(`/sequence?type=${seq}&nb_carre=${nb_carre}&coter=${coter}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Erreur HTTP : " + res.status);
+          return res.text();
+        })
+        .then((text) => console.log("Réponse du serveur :", text))
+        .catch((e) => console.error("Erreur fetch :", e));
+        
       if(seq=="multiCarre") closeEscalierModal();
+      
     }
 
     function sendRoseSequence(seq) {
-      fetch(`/rose?type=${seq}`).catch((e) => {});
-
+      
       fetch(`/rose?type=${seq}`)
         .then((res) => {
           if (!res.ok) throw new Error("Erreur HTTP : " + res.status);
