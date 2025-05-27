@@ -156,35 +156,117 @@ void Actualiser_co (int delta_D, int delta_G){
     pos_Y += (dist * sin(anglerobot));
 }
 
+
 void Discretiser(){
+
+    static float x0 = 0;
+    static float y0 = 0;
+    static bool first_call = true;
+
+
+    if (mode > 0 && first_call) {
+        x0 = pos_X;
+        y0 = pos_Y;
+        first_call = false;
+    }
     switch (mode){
-        case 1:{  //Escalier
+        case 1: { // escalier
+            switch (i) {
+                case 1: case 2: case 3: case 4: case 5:
+                    consigne_pos_X = x0 + 40 * i;
+                    consigne_pos_Y = y0;
+                    break;
+                case 6: case 7: case 8: case 9: case 10:
+                    consigne_pos_X = x0 + 200;
+                    consigne_pos_Y = y0 + 20 * (i - 5);
+                    break;
+                case 11: case 12: case 13: case 14: case 15:
+                    consigne_pos_X = x0 + 200 + 80 * (i - 10);
+                    consigne_pos_Y = y0 + 100;
+                    break;
+                default:
+                    mode = 0; //= arret
+                    first_call = true;
+                    break;
+            }
             break;
         }
-        case 2:{  //Carré dans carré etc
+
+
+        case 2:{
+            static int direction = 0; // 0: droite, 1: haut, 2: gauche, 3: bas
+            static float currentLength = coteCarre; // Longueur initiale du côté
+            static int step_in_square = 0; // Étape à l’intérieur d’un carré
+            static int squareIndex = 0;    // Combien de carrés on a fait
+
+            const int steps_per_side = 5; // Divise chaque côté en 5 petits pas
+            float stepLength = currentLength / steps_per_side;
+
+            if (squareIndex >= nbCarre) {
+                i = 999; // Stop
+                break;
+            }
+
+            switch (direction % 4) {
+                case 0: // droite
+                    consigne_pos_X = pos_X + stepLength;
+                    consigne_pos_Y = pos_Y;
+                    break;
+                case 1: // haut
+                    consigne_pos_X = pos_X;
+                    consigne_pos_Y = pos_Y + stepLength;
+                    break;
+                case 2: // gauche
+                    consigne_pos_X = pos_X - stepLength;
+                    consigne_pos_Y = pos_Y;
+                    break;
+                case 3: // bas
+                    consigne_pos_X = pos_X;
+                    consigne_pos_Y = pos_Y - stepLength;
+                    break;
+            }
+
+            step_in_square++;
+            if (step_in_square >= steps_per_side) {
+                step_in_square = 0;
+                direction++;
+                if (direction % 2 == 0) {
+                    currentLength *= 0.8; // Le carré devient plus petit tous les 2 virages
+                    squareIndex++;
+                }
+            }
+
             break;
-        } 
+        }
+         
         case 3:{  //Cercle
-            if(i>=nbPoint) i=nbPoint;
+            if(i>nbPoint){
+                mode = 0;
+                first_call = true;
+            }
             float angle = 2*PI*(i/(float)nbPoint);
-            consigne_pos_X += radius * cos(angle);
-            consigne_pos_Y += radius * sin(angle);
+            consigne_pos_X = radius * cos(angle); //= ou +=
+            consigne_pos_Y = radius * sin(angle); //= ou +=
             break;
         }
         case 4:{  //Rosace
+            consigne_pos_X = pos_X + 200;
+            mode = 0;
+            first_call = true;
             break;
         } 
         case 5:{  //Rose des vents
             break;
 
 
-            
+
         } 
         case 6:{  //Flêche
             break;
         } 
         default:{
             i =0;
+            first_call = true;
             break;
         }
     }
