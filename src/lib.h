@@ -61,6 +61,7 @@ extern long nb_tic_encodeur_G;
 #include<WiFi.h>
 #include <WebServer.h>
 #define SPLEEP_TIME 500
+#define ecartCarre 50 //Chaque carré sera espacé de 50 mm
 extern WebServer server;
 extern String htmlPage;
 extern int Joy_X, Joy_Y; 
