@@ -216,7 +216,7 @@ float Find_north(void){ //FIXME north programme
     mag.read();
     float heading = atan2(mag.m.y, -mag.m.x) * 180 / PI;
     if (heading < 0) heading += 360;
-    return heading;
+    return heading; 
 }
 
 void DEBUG_North (void){ 
