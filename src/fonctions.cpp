@@ -189,38 +189,38 @@ void DEBUG_angle(void){
     Serial.println(Find_angle());
 }
 
-LIS3MDL mag;
-void Enable_MAG (void){  //calibration : min: { -4750,  -2345,  -1612}   max: {  -773,  +2753,  +3158}
-    if (!mag.init())
-    {
-      Serial.println("Erreur : magnetometer non détecté !");
-      //while (1);
-    }else{
-        Serial.println("Initialize magnetometer!");
-    }
+// // LIS3MDL mag;
+// void Enable_MAG (void){  //calibration : min: { -4750,  -2345,  -1612}   max: {  -773,  +2753,  +3158}
+//     if (!mag.init())
+//     {
+//       Serial.println("Erreur : magnetometer non détecté !");
+//       //while (1);
+//     }else{
+//         Serial.println("Initialize magnetometer!");
+//     }
   
-    mag.enableDefault();
-}
+//     mag.enableDefault();
+// }
 
-void DEBUG_MAG(void){
-    mag.read();
-    Serial.print(">MagX:");
-    Serial.println(mag.m.x);    // Affiche mag X
-    Serial.print(">MagY:");
-    Serial.println(mag.m.y);    // Affiche mag Y
-    Serial.print(">MagZ:");
-    Serial.println(mag.m.z);    // Affiche mag Z
-}
+// void DEBUG_MAG(void){
+//     mag.read();
+//     Serial.print(">MagX:");
+//     Serial.println(mag.m.x);    // Affiche mag X
+//     Serial.print(">MagY:");
+//     Serial.println(mag.m.y);    // Affiche mag Y
+//     Serial.print(">MagZ:");
+//     Serial.println(mag.m.z);    // Affiche mag Z
+// }
 
-float Find_north(void){ //FIXME north programme
-    mag.read();
-    float heading = atan2(mag.m.y, -mag.m.x) * 180 / PI;
-    if (heading < 0) heading += 360;
-    return heading; 
-}
+// float Find_north(void){ //FIXME north programme
+//     mag.read();
+//     float heading = atan2(mag.m.y, -mag.m.x) * 180 / PI;
+//     if (heading < 0) heading += 360;
+//     return heading; 
+// }
 
-void DEBUG_North (void){ 
-    Serial.print(">North:");
-    Serial.println(Find_north());
-}
+// void DEBUG_North (void){ 
+//     Serial.print(">North:");
+//     Serial.println(Find_north());
+// }
 

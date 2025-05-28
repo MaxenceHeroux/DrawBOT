@@ -1,4 +1,56 @@
 #include <lib.h>
+Adafruit_LIS3MDL mag;
+float mag_offset_x = 0;
+float mag_offset_y = 0;
+float mag_scale_x = 1;
+float mag_scale_y = 1;
+bool calibrated = false;
+
+
+void calibrerMagnetometre(void) {
+  mag_offset_x = 0;
+  mag_offset_y = 0;
+  mag_scale_x = 1;
+  mag_scale_y = 1;
+  calibrated = true;
+
+  delay(3000);
+  float min_x = 9999, max_x = -9999;
+  float min_y = 9999, max_y = -9999;
+
+  unsigned long startTime = millis();
+  analogWrite(IN_1_D, 150);
+  analogWrite(IN_2_D, 0);
+  analogWrite(IN_1_G, 150);
+  analogWrite(IN_2_G, 0);
+
+  while (millis() - startTime < 7000) {
+    sensors_event_t event;
+    mag.getEvent(&event);
+    float x = event.magnetic.x;
+    float y = event.magnetic.y;
+
+    min_x = min(min_x, x); max_x = max(max_x, x);
+    min_y = min(min_y, y); max_y = max(max_y, y);
+    delay(100);
+  }
+
+  Disable_moteur();
+
+  mag_offset_x = (max_x + min_x) / 2.0;
+  mag_offset_y = (max_y + min_y) / 2.0;
+
+  float range_x = max_x - min_x;
+  float range_y = max_y - min_y;
+  float avg_range = (range_x + range_y) / 2.0;
+
+  mag_scale_x = avg_range / range_x;
+  mag_scale_y = avg_range / range_y;
+
+  calibrated = true;
+}
+
+
 
 void setup() {
   Serial.begin(9600);
@@ -18,7 +70,12 @@ void setup() {
   //IMU
   Enable_IMU();
   //Magneto
-  Enable_MAG();
+  // Enable_MAG();
+  if (!mag.begin_I2C(0x1E, &Wire)) {
+    Serial.println("Erreur: LIS3MDL non détecté.");
+    while (1);
+  }
+  calibrerMagnetometre();
 }
 
 int consigne_dist;

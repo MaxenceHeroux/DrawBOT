@@ -84,8 +84,18 @@ extern float Kd_dist;
 extern LSM6DS3 myIMU;
 
 //Magneto
-#include <LIS3MDL.h>
-extern LIS3MDL mag;
+// #include <LIS3MDL.h>
+#include <Adafruit_LIS3MDL.h>
+#include <Adafruit_Sensor.h>
+#define DECLINAISON_MAGNETIQUE 1.7833  // 1°47'
+extern Adafruit_LIS3MDL mag;
+extern float mag_offset_x;
+extern float mag_offset_y;
+extern float mag_scale_x;
+extern float mag_scale_y;
+extern bool calibrated;
+
+
 
 //fonctions.cpp
 int signe(int val);
@@ -112,6 +122,9 @@ void Enable_MAG (void);
 void DEBUG_MAG(void);
 float Find_north (void);
 void DEBUG_North (void);
+void calibrerMagnetometre(void);
+float lireCapMagnetique(void);
+void rechercherNord(void);
 
 //Asservissement.cpp
 int Ticks_to_Distance (int distance);
