@@ -191,7 +191,7 @@ void Discretiser(){
             }
             break;
         }
-        // case 2: { // Carré dans carré
+        // case 2: { // Carré imbriqué
         //     int reste = i % 4;        // Côté du carré en cours (0 à 3)
         //     int entier = i / 4;       // Numéro du carré (combien déjà tracés)
 
