@@ -191,51 +191,49 @@ void Discretiser(){
             }
             break;
         }
-        // case 2:{ //Carré dans carré etc
-        //     static int direction = 0; // 0: droite, 1: haut, 2: gauche, 3: bas
-        //     static float currentLength = coteCarre; // Longueur initiale du côté
-        //     static int step_in_square = 0; // Étape à l’intérieur d’un carré
-        //     static int squareIndex = 0;    // Combien de carrés on a fait
+        // case 2: { // Carré dans carré
+        //     int reste = i % 4;        // Côté du carré en cours (0 à 3)
+        //     int entier = i / 4;       // Numéro du carré (combien déjà tracés)
 
-        //     const int steps_per_side = 5; // Divise chaque côté en 5 petits pas
-        //     float stepLength = currentLength / steps_per_side;
+        //     if (entier <= nbCarre) {
+        //         int demiCote = coteCarre / 2;
+        //         int r = entier * ecartCarre;
 
-        //     if (squareIndex >= nbCarre) {
-        //         mode = 0; // Stop
-        //         break;
-        //     }
+        //         // Coordonnées des coins du carré courant
+        //         int x1 = x0 - demiCote + r;  // gauche
+        //         int x2 = x0 + demiCote - r;  // droite
+        //         int y1 = y0 - demiCote + r;  // bas
+        //         int y2 = y0 + demiCote - r;  // haut
 
-        //     switch (direction % 4) {
-        //         case 0: // droite
-        //             consigne_pos_X = pos_X + stepLength;
-        //             consigne_pos_Y = pos_Y;
-        //             break;
-        //         case 1: // haut
-        //             consigne_pos_X = pos_X;
-        //             consigne_pos_Y = pos_Y + stepLength;
-        //             break;
-        //         case 2: // gauche
-        //             consigne_pos_X = pos_X - stepLength;
-        //             consigne_pos_Y = pos_Y;
-        //             break;
-        //         case 3: // bas
-        //             consigne_pos_X = pos_X;
-        //             consigne_pos_Y = pos_Y - stepLength;
-        //             break;
-        //     }
+        //         switch (reste) {
+        //             case 0: // Aller à droite (bas)
+        //                 consigne_pos_X = x2;
+        //                 consigne_pos_Y = y1;
+        //                 break;
 
-        //     step_in_square++;
-        //     if (step_in_square >= steps_per_side) {
-        //         step_in_square = 0;
-        //         direction++;
-        //         if (direction % 2 == 0) {
-        //             currentLength *= 0.8; // Le carré devient plus petit tous les 2 virages
-        //             squareIndex++;
+        //             case 1: // Monter (droite)
+        //                 consigne_pos_X = x2;
+        //                 consigne_pos_Y = y2;
+        //                 break;
+
+        //             case 2: // Aller à gauche (haut)
+        //                 consigne_pos_X = x1;
+        //                 consigne_pos_Y = y2;
+        //                 break;
+
+        //             case 3: // Descendre (gauche)
+        //                 consigne_pos_X = x1;
+        //                 consigne_pos_Y = y1;
+        //                 break;
         //         }
+        //     } else {
+        //         mode = 0;       // Fin de la séquence
+        //         first_call = true;
+        //         i = 0;
         //     }
-
         //     break;
         // }
+
         case 2:{ //Carré dans carré etc
             int reste = i % 4; //Correspond au côté qu'on est en train de tracé
             int entier = i/4; //Entier est le nombre de carré(s) tracé(s)
@@ -291,10 +289,25 @@ void Discretiser(){
             break;
         }
         case 4:{  //Rosace
-            consigne_pos_X = pos_X + 200;
-            mode = 0;
-            first_call = true;
-            i = 0;
+            // Paramètres de la rosace
+            int nb_petales = 6;       // Nombre de pétales
+            float amplitude = 30;     // Longueur de chaque pétale
+            float rayon_base = 50;    // Rayon du cercle central
+            float angle_step = 2 * PI / nbPoint; // Incrément d'angle entre chaque point
+
+            if (i > nbPoint) {
+                mode = 0;         // Fin du dessin
+                i = 0;
+                first_call = true;
+            } else {
+                float angle = i * angle_step;
+
+                // Rayon variant en fonction de l’angle => rosace
+                float r = rayon_base + amplitude * sin(nb_petales * angle);
+
+                consigne_pos_X = x0 + r * cos(angle);
+                consigne_pos_Y = y0 + r * sin(angle);
+            }
             break;
         } 
         case 5:{  //Rose des vents
