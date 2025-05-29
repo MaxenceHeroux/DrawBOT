@@ -360,8 +360,8 @@ void Discretiser(){
             };
 
             //Pour un départ à (0, 0) :
-            consigne_pos_X = tab_consignes_fleche[i][0]; //Colonne 0 pour les x
-            consigne_pos_Y = tab_consignes_fleche[i][1]; //Colonne 1 pour les y
+            // consigne_pos_X = tab_consignes_fleche[i][0]; //Colonne 0 pour les x
+            // consigne_pos_Y = tab_consignes_fleche[i][1]; //Colonne 1 pour les y
             
             // Pour n'importe quelle coordonnées :
             consigne_pos_X = x0 + tab_consignes_fleche[i][0]; //Colonne 0 pour les x
