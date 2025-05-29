@@ -171,18 +171,41 @@ void Discretiser(){
     switch (mode){
         case 1: { // Escalier
             switch (i) {
-                case 1: case 2: case 3: case 4: case 5:
-                    consigne_pos_X = x0 + 40 * i;
+                case 0: { //Fais une ligne pour marquer le début
+                    consigne_pos_X = x0;
+                    consigne_pos_Y = y0 + 20;
+                    break;
+                }
+                case 1: {
+                    consigne_pos_X = x0;
+                    consigne_pos_Y = y0 - 20;
+                    break;
+                }
+                case 2:{
+                    consigne_pos_X = x0;
                     consigne_pos_Y = y0;
                     break;
-                case 6: case 7: case 8: case 9: case 10:
-                    consigne_pos_X = x0 + 200;
-                    consigne_pos_Y = y0 + 20 * (i - 5);
+                } //Début de la figure
+                case 3: case 4: case 5: case 6: case 7:
+                    consigne_pos_X = x0 + 40 * (i - 3);
+                    consigne_pos_Y = y0;
                     break;
-                case 11: case 12: case 13: case 14: case 15:
-                    consigne_pos_X = x0 + 200 + 80 * (i - 10);
+                case 8: case 9: case 10: case 11: case 12:
+                    consigne_pos_X = x0 + 200;
+                    consigne_pos_Y = y0 + 20 * (i - 8);
+                    break;
+                case 13: case 14: case 15: case 16: case 17:
+                    consigne_pos_X = x0 + 200 + 80 * (i - 13);
                     consigne_pos_Y = y0 + 100;
                     break;
+                case 18:{ // Fais une ligne pour marquer la fin
+                    consigne_pos_X = x0 + 600;
+                    consigne_pos_Y = y0 + 100 + 20;
+                }
+                case 19:{
+                    consigne_pos_X = x0 + 600;
+                    consigne_pos_Y = y0 + 100 - 20;
+                }
                 default:
                     mode = 0; //= arret
                     first_call = true;
@@ -191,87 +214,87 @@ void Discretiser(){
             }
             break;
         }
-        case 2: { // Carré imbriqué
-            int reste = i % 4;        // Côté du carré en cours (0 à 3)
-            int entier = i / 4;       // Numéro du carré (combien déjà tracés)
+        // case 2: { // Carré imbriqué
+        //     int reste = i % 4;        // Côté du carré en cours (0 à 3)
+        //     int entier = i / 4;       // Numéro du carré (combien déjà tracés)
 
-            if (entier <= nbCarre) {
-                int demiCote = coteCarre / 2;
-                int r = entier * ecartCarre;
+        //     if (entier <= nbCarre) {
+        //         int demiCote = coteCarre / 2;
+        //         int r = entier * ecartCarre;
 
-                // Coordonnées des coins du carré courant
-                int x1 = x0 - demiCote + r;  // gauche
-                int x2 = x0 + demiCote - r;  // droite
-                int y1 = y0 - demiCote + r;  // bas
-                int y2 = y0 + demiCote - r;  // haut
+        //         // Coordonnées des coins du carré courant
+        //         int x1 = x0 - demiCote + r;  // gauche
+        //         int x2 = x0 + demiCote - r;  // droite
+        //         int y1 = y0 - demiCote + r;  // bas
+        //         int y2 = y0 + demiCote - r;  // haut
 
-                switch (reste) {
-                    case 0: // Aller à droite (bas)
-                        consigne_pos_X = x2;
-                        consigne_pos_Y = y1;
-                        break;
-
-                    case 1: // Monter (droite)
-                        consigne_pos_X = x2;
-                        consigne_pos_Y = y2;
-                        break;
-
-                    case 2: // Aller à gauche (haut)
-                        consigne_pos_X = x1;
-                        consigne_pos_Y = y2;
-                        break;
-
-                    case 3: // Descendre (gauche)
-                        consigne_pos_X = x1;
-                        consigne_pos_Y = y1;
-                        break;
-                }
-            } else {
-                mode = 0;       // Fin de la séquence
-                first_call = true;
-                i = 0;
-            }
-            break;
-        }
-
-        // case 2:{ //Carré imbriqué
-        //     int reste = i % 4; //Correspond au côté qu'on est en train de tracé
-        //     int entier = i/4; //Entier est le nombre de carré(s) tracé(s)
-
-        //     if(entier <= nbCarre){
         //         switch (reste) {
-        //             case 0:{
-        //                 consigne_pos_X = x0 + coteCarre - entier*ecartCarre;
-        //                 consigne_pos_Y = pos_Y;
+        //             case 0: // Aller à droite (bas)
+        //                 consigne_pos_X = x2;
+        //                 consigne_pos_Y = y1;
         //                 break;
-        //             }
-        //             case 1:{
-        //                 consigne_pos_Y = y0 - coteCarre + entier*ecartCarre;
-        //                 consigne_pos_X = pos_X;
-        //                 break;
-        //             }
-        //             case 2:{
-        //                 consigne_pos_X = x0 + entier*ecartCarre;
-        //                 consigne_pos_Y = pos_Y;
-        //                 break;
-        //             }
-        //             case 3:{
-        //                 consigne_pos_Y = y0 - ((entier + 1) * 50);
-        //                 consigne_pos_X = pos_X;
-        //                 break;
-        //             }
 
-        //             default:{
+        //             case 1: // Monter (droite)
+        //                 consigne_pos_X = x2;
+        //                 consigne_pos_Y = y2;
         //                 break;
-        //             }
+
+        //             case 2: // Aller à gauche (haut)
+        //                 consigne_pos_X = x1;
+        //                 consigne_pos_Y = y2;
+        //                 break;
+
+        //             case 3: // Descendre (gauche)
+        //                 consigne_pos_X = x1;
+        //                 consigne_pos_Y = y1;
+        //                 break;
         //         }
         //     } else {
-        //         mode = 0; //Arrêt
+        //         mode = 0;       // Fin de la séquence
         //         first_call = true;
         //         i = 0;
         //     }
         //     break;
         // }
+
+        case 2:{ //Carré imbriqué
+            int reste = i % 4; //Correspond au côté qu'on est en train de tracé
+            int entier = i/4; //Entier est le nombre de carré(s) tracé(s)
+
+            if(entier <= nbCarre){
+                switch (reste) {
+                    case 0:{
+                        consigne_pos_X = x0 + coteCarre - entier*ecartCarre;
+                        consigne_pos_Y = pos_Y;
+                        break;
+                    }
+                    case 1:{
+                        consigne_pos_Y = y0 - coteCarre + entier*ecartCarre;
+                        consigne_pos_X = pos_X;
+                        break;
+                    }
+                    case 2:{
+                        consigne_pos_X = x0 + entier*ecartCarre;
+                        consigne_pos_Y = pos_Y;
+                        break;
+                    }
+                    case 3:{
+                        consigne_pos_Y = y0 - ((entier + 1) * 50);
+                        consigne_pos_X = pos_X;
+                        break;
+                    }
+
+                    default:{
+                        break;
+                    }
+                }
+            } else {
+                mode = 0; //Arrêt
+                first_call = true;
+                i = 0;
+            }
+            break;
+        }
         case 3:{  //Cercle
             if(i>nbPoint){
                 mode = 0;

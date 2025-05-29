@@ -36,10 +36,10 @@ void loop() {
   int Commande_MD =0, Commande_MG =0;
 
   if(abs(consigne_dist) <5){ //&& abs(consigne_angle) <10
-    i++;
     digitalWrite(LEDU1, HIGH);
     
     Discretiser(); // modifie les consignes    
+    i++;
 
     Reset_pid_distance();
     Reset_pid_angle();
