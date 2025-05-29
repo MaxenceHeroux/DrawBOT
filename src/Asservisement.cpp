@@ -191,87 +191,87 @@ void Discretiser(){
             }
             break;
         }
-        // case 2: { // Carré imbriqué
-        //     int reste = i % 4;        // Côté du carré en cours (0 à 3)
-        //     int entier = i / 4;       // Numéro du carré (combien déjà tracés)
+        case 2: { // Carré imbriqué
+            int reste = i % 4;        // Côté du carré en cours (0 à 3)
+            int entier = i / 4;       // Numéro du carré (combien déjà tracés)
 
-        //     if (entier <= nbCarre) {
-        //         int demiCote = coteCarre / 2;
-        //         int r = entier * ecartCarre;
+            if (entier <= nbCarre) {
+                int demiCote = coteCarre / 2;
+                int r = entier * ecartCarre;
 
-        //         // Coordonnées des coins du carré courant
-        //         int x1 = x0 - demiCote + r;  // gauche
-        //         int x2 = x0 + demiCote - r;  // droite
-        //         int y1 = y0 - demiCote + r;  // bas
-        //         int y2 = y0 + demiCote - r;  // haut
+                // Coordonnées des coins du carré courant
+                int x1 = x0 - demiCote + r;  // gauche
+                int x2 = x0 + demiCote - r;  // droite
+                int y1 = y0 - demiCote + r;  // bas
+                int y2 = y0 + demiCote - r;  // haut
 
-        //         switch (reste) {
-        //             case 0: // Aller à droite (bas)
-        //                 consigne_pos_X = x2;
-        //                 consigne_pos_Y = y1;
-        //                 break;
-
-        //             case 1: // Monter (droite)
-        //                 consigne_pos_X = x2;
-        //                 consigne_pos_Y = y2;
-        //                 break;
-
-        //             case 2: // Aller à gauche (haut)
-        //                 consigne_pos_X = x1;
-        //                 consigne_pos_Y = y2;
-        //                 break;
-
-        //             case 3: // Descendre (gauche)
-        //                 consigne_pos_X = x1;
-        //                 consigne_pos_Y = y1;
-        //                 break;
-        //         }
-        //     } else {
-        //         mode = 0;       // Fin de la séquence
-        //         first_call = true;
-        //         i = 0;
-        //     }
-        //     break;
-        // }
-
-        case 2:{ //Carré imbriqué
-            int reste = i % 4; //Correspond au côté qu'on est en train de tracé
-            int entier = i/4; //Entier est le nombre de carré(s) tracé(s)
-
-            if(entier <= nbCarre){
                 switch (reste) {
-                    case 0:{
-                        consigne_pos_X = x0 + coteCarre - entier*ecartCarre;
-                        consigne_pos_Y = pos_Y;
+                    case 0: // Aller à droite (bas)
+                        consigne_pos_X = x2;
+                        consigne_pos_Y = y1;
                         break;
-                    }
-                    case 1:{
-                        consigne_pos_Y = y0 - coteCarre + entier*ecartCarre;
-                        consigne_pos_X = pos_X;
-                        break;
-                    }
-                    case 2:{
-                        consigne_pos_X = x0 + entier*ecartCarre;
-                        consigne_pos_Y = pos_Y;
-                        break;
-                    }
-                    case 3:{
-                        consigne_pos_Y = y0 - ((entier + 1) * 50);
-                        consigne_pos_X = pos_X;
-                        break;
-                    }
 
-                    default:{
+                    case 1: // Monter (droite)
+                        consigne_pos_X = x2;
+                        consigne_pos_Y = y2;
                         break;
-                    }
+
+                    case 2: // Aller à gauche (haut)
+                        consigne_pos_X = x1;
+                        consigne_pos_Y = y2;
+                        break;
+
+                    case 3: // Descendre (gauche)
+                        consigne_pos_X = x1;
+                        consigne_pos_Y = y1;
+                        break;
                 }
             } else {
-                mode = 0; //Arrêt
+                mode = 0;       // Fin de la séquence
                 first_call = true;
                 i = 0;
             }
             break;
         }
+
+        // case 2:{ //Carré imbriqué
+        //     int reste = i % 4; //Correspond au côté qu'on est en train de tracé
+        //     int entier = i/4; //Entier est le nombre de carré(s) tracé(s)
+
+        //     if(entier <= nbCarre){
+        //         switch (reste) {
+        //             case 0:{
+        //                 consigne_pos_X = x0 + coteCarre - entier*ecartCarre;
+        //                 consigne_pos_Y = pos_Y;
+        //                 break;
+        //             }
+        //             case 1:{
+        //                 consigne_pos_Y = y0 - coteCarre + entier*ecartCarre;
+        //                 consigne_pos_X = pos_X;
+        //                 break;
+        //             }
+        //             case 2:{
+        //                 consigne_pos_X = x0 + entier*ecartCarre;
+        //                 consigne_pos_Y = pos_Y;
+        //                 break;
+        //             }
+        //             case 3:{
+        //                 consigne_pos_Y = y0 - ((entier + 1) * 50);
+        //                 consigne_pos_X = pos_X;
+        //                 break;
+        //             }
+
+        //             default:{
+        //                 break;
+        //             }
+        //         }
+        //     } else {
+        //         mode = 0; //Arrêt
+        //         first_call = true;
+        //         i = 0;
+        //     }
+        //     break;
+        // }
         case 3:{  //Cercle
             if(i>nbPoint){
                 mode = 0;
@@ -279,6 +279,7 @@ void Discretiser(){
                 first_call = true;
             }
             float angle = 2*PI*(i/(float)nbPoint);
+            //Pour un départ à (0, 0) :
             consigne_pos_X = radius * cos(angle); //= ou +=
             consigne_pos_Y = radius * sin(angle); //= ou +=
 
@@ -328,13 +329,14 @@ void Discretiser(){
                 {25, 25},
                 {50, 0}
             };
-
-            consigne_pos_X = tab_consignes_windrose[i][0]; //Colonne 0 pour les x
-            consigne_pos_Y = tab_consignes_windrose[i][1]; //Colonne 1 pour les y
+            
+            //Pour un départ à (0, 0) :
+            // consigne_pos_X = tab_consignes_windrose[i][0]; //Colonne 0 pour les x
+            // consigne_pos_Y = tab_consignes_windrose[i][1]; //Colonne 1 pour les y
             
             // Pour n'importe quelle coordonnées :
-            // consigne_pos_X = x0 + tab_consignes_windrose[i][0]; //Colonne 0 pour les x
-            // consigne_pos_Y = y0 + tab_consignes_windrose[i][1]; //Colonne 1 pour les y
+            consigne_pos_X = x0 + tab_consignes_windrose[i][0]; //Colonne 0 pour les x
+            consigne_pos_Y = y0 + tab_consignes_windrose[i][1]; //Colonne 1 pour les y
 
 
             if(i >= taille_lignes_consigne_windrose-1){
@@ -349,15 +351,6 @@ void Discretiser(){
             //TODO Trouver le Nord
 
             int taille_lignes_consigne_fleche = 5;
-            // Pour n'importe quelle coordonnées :
-            // float tab_consignes_fleche[taille_lignes_consigne_fleche][2] = {
-            //                                     {X0, Y0},   // départ
-            //                                     {X0 + 60, Y0 + 0},   // fin de la tige
-            //                                     {X0 + 40, Y0 -10},  // aile inférieure
-            //                                     {X0 + 40, Y0 +10},  // aile supérieure
-            //                                     {X0 + 60, Y0 + 0}    // retour à la pointe
-            //                                    };
-
             float tab_consignes_fleche[taille_lignes_consigne_fleche][2] = {
                 {0, 0},
                 {60, 0},
@@ -366,8 +359,13 @@ void Discretiser(){
                 {60, 0}
             };
 
+            //Pour un départ à (0, 0) :
             consigne_pos_X = tab_consignes_fleche[i][0]; //Colonne 0 pour les x
             consigne_pos_Y = tab_consignes_fleche[i][1]; //Colonne 1 pour les y
+            
+            // Pour n'importe quelle coordonnées :
+            consigne_pos_X = x0 + tab_consignes_fleche[i][0]; //Colonne 0 pour les x
+            consigne_pos_Y = y0 + tab_consignes_fleche[i][1]; //Colonne 1 pour les y
 
             if(i >= taille_lignes_consigne_fleche-1){
                 mode = 0; //arret
