@@ -161,6 +161,7 @@ void Discretiser(){
     static float y0 = 0;
     static bool first_call = true;
 
+    //Met à jour le point de départ
     if (mode > 0 && first_call) {
         x0 = pos_X;
         y0 = pos_Y;
@@ -185,6 +186,7 @@ void Discretiser(){
                 default:
                     mode = 0; //= arret
                     first_call = true;
+                    i = 0;
                     break;
             }
             break;
@@ -267,33 +269,102 @@ void Discretiser(){
                 }
             } else {
                 mode = 0; //Arrêt
+                first_call = true;
+                i = 0;
             }
             break;
         }
         case 3:{  //Cercle
             if(i>nbPoint){
                 mode = 0;
+                i = 0;
                 first_call = true;
             }
             float angle = 2*PI*(i/(float)nbPoint);
             consigne_pos_X = radius * cos(angle); //= ou +=
             consigne_pos_Y = radius * sin(angle); //= ou +=
+
+            // Pour n'importe quelle coordonnées :
+            // consigne_pos_X = x0 + radius * cos(angle);
+            // consigne_pos_Y = y0 + radius * sin(angle);
+
             break;
         }
         case 4:{  //Rosace
             consigne_pos_X = pos_X + 200;
             mode = 0;
             first_call = true;
+            i = 0;
             break;
         } 
         case 5:{  //Rose des vents
+            //TODO trouver le Nord
+
+            int taille_lignes_consigne_windrose = 12; //Sans compter le cercle
+            float tab_consignes_windrose[taille_lignes_consigne_windrose][2] = {
+                {0, 0},
+                {100, 0},
+                {50, 0},
+                {50, -50},
+                {50, 50},
+                {50, 0},
+                {25, -25},
+                {75, 25},
+                {50, 0},
+                {75, -25},
+                {25, 25},
+                {50, 0}
+            };
+
+            consigne_pos_X = tab_consignes_windrose[i][0]; //Colonne 0 pour les x
+            consigne_pos_Y = tab_consignes_windrose[i][1]; //Colonne 1 pour les y
+            
+            // Pour n'importe quelle coordonnées :
+            // consigne_pos_X = x0 + tab_consignes_windrose[i][0]; //Colonne 0 pour les x
+            // consigne_pos_Y = y0 + tab_consignes_windrose[i][1]; //Colonne 1 pour les y
+
+
+            if(i >= taille_lignes_consigne_windrose-1){
+                mode = 3; // Fais un cercle
+                radius = 50; //Pour que ca corresponde aux croix dessinnées
+                i = 0;
+                first_call = true;
+            }
             break;
         } 
-        case 6:{  //Flêche
+        case 6:{  //Flèche
+            //TODO Trouver le Nord
+
+            int taille_lignes_consigne_fleche = 5;
+            // Pour n'importe quelle coordonnées :
+            // float tab_consignes_fleche[taille_lignes_consigne_fleche][2] = {
+            //                                     {X0, Y0},   // départ
+            //                                     {X0 + 60, Y0 + 0},   // fin de la tige
+            //                                     {X0 + 40, Y0 -10},  // aile inférieure
+            //                                     {X0 + 40, Y0 +10},  // aile supérieure
+            //                                     {X0 + 60, Y0 + 0}    // retour à la pointe
+            //                                    };
+
+            float tab_consignes_fleche[taille_lignes_consigne_fleche][2] = {
+                {0, 0},
+                {60, 0},
+                {40, -10},
+                {40, 10},
+                {60, 0}
+            };
+
+            consigne_pos_X = tab_consignes_fleche[i][0]; //Colonne 0 pour les x
+            consigne_pos_Y = tab_consignes_fleche[i][1]; //Colonne 1 pour les y
+
+            if(i >= taille_lignes_consigne_fleche-1){
+                mode = 0; //arret
+                i = 0;
+                first_call = true;
+            }
             break;
         } 
         default:{
-            i =0;
+            i = 0;
             first_call = true;
             break;
         }
