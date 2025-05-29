@@ -234,7 +234,7 @@ void Discretiser(){
         //     break;
         // }
 
-        case 2:{ //Carré dans carré etc
+        case 2:{ //Carré imbriqué
             int reste = i % 4; //Correspond au côté qu'on est en train de tracé
             int entier = i/4; //Entier est le nombre de carré(s) tracé(s)
 
