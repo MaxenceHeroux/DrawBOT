@@ -342,6 +342,7 @@ void Discretiser(){
             if(i >= taille_lignes_consigne_windrose-1){
                 mode = 3; // Fais un cercle
                 radius = 50; //Pour que ca corresponde aux croix dessinnées
+                nbPoint = 20;
                 i = 0;
                 first_call = true;
             }
