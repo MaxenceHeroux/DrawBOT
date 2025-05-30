@@ -1,0 +1,259 @@
+#include <Arduino.h>
+#include <Wire.h>
+#include <Adafruit_LIS3MDL.h>
+#include <Adafruit_Sensor.h>
+#include <EEPROM.h>
+
+// === I2C pour ESP32 ===
+#define SDA_I2C 21
+#define SCL_I2C 22
+#define ADDR_MAG 0x1E
+
+// === CONFIGURATION DES PINS ===
+#define IN1_G 17
+#define IN2_G 16
+#define EN_G  4
+#define IN1_D 19
+#define IN2_D 18
+#define EN_D  23
+
+
+#define PWM_FREQ 5000
+#define PWM_RES 8
+#define CH_G 0
+#define CH_D 1
+
+
+// === INVERSION DES MOTEURS (1 = inversé, 0 = normal) ===
+#define MOTEUR_GAUCHE_INVERSE 0
+#define MOTEUR_DROIT_INVERSE  1  // inverse ici si nécessaire
+
+// === EEPROM ===
+#define EEPROM_OFFSET_ADDR 0
+#define EEPROM_SIZE 16
+
+// === Correction manuelle de l’orientation capteur ===
+#define ORIENTATION_OFFSET_DEGRES -90
+
+// === Capteur magnétomètre ===
+Adafruit_LIS3MDL lis3mdl;
+
+// === Offsets calibrés ===
+float mag_offset_x = 0;
+float mag_offset_y = 0;
+
+// === Prototypes ===
+void calibrateMagnetometer();
+String getCardinal(float heading);
+bool isHeadingNorth(float heading);
+
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  Wire.begin(SDA_I2C, SCL_I2C);
+
+  if (!lis3mdl.begin_I2C(ADDR_MAG)) {
+    Serial.println("❌ LIS3MDL non détecté !");
+    while (1);
+  }
+
+  Serial.println("✅ LIS3MDL détecté");
+
+  lis3mdl.setPerformanceMode(LIS3MDL_MEDIUMMODE);
+  lis3mdl.setOperationMode(LIS3MDL_CONTINUOUSMODE);
+  lis3mdl.setDataRate(LIS3MDL_DATARATE_155_HZ);  // ✅ constante valide
+  lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS);
+
+  // Initialiser EEPROM
+  EEPROM.begin(EEPROM_SIZE);
+
+  // Lire les offsets de l’EEPROM
+  EEPROM.get(EEPROM_OFFSET_ADDR, mag_offset_x);
+  EEPROM.get(EEPROM_OFFSET_ADDR + sizeof(float), mag_offset_y);
+
+  Serial.println("📦 Offsets chargés :");
+  Serial.print("  X : "); Serial.println(mag_offset_x, 2);
+  Serial.print("  Y : "); Serial.println(mag_offset_y, 2);
+
+  Serial.println("Tapez 'c' pour lancer la calibration manuelle.");
+
+    ledcAttachPin(IN1_G, 0);
+  ledcAttachPin(IN2_G, 1);
+  ledcAttachPin(IN1_D, 2);
+  ledcAttachPin(IN2_D, 3);
+
+  ledcSetup(0, 1000, 8);  // Canal 0 → IN_1_G
+  ledcSetup(1, 1000, 8);  // Canal 1 → IN_2_G
+  ledcSetup(2, 1000, 8);  // Canal 2 → IN_1_D
+  ledcSetup(3, 1000, 8);  // Canal 3 → IN_2_D
+  pinMode(EN_D, OUTPUT);
+  pinMode(EN_G, OUTPUT);
+  digitalWrite(EN_D, HIGH);
+  digitalWrite(EN_G, HIGH);
+}
+
+// === Fonction universelle pour piloter les moteurs ===
+void setMoteur(bool sensGaucheAvant, int pwmG, bool sensDroitAvant, int pwmD) {
+  bool dirG = MOTEUR_GAUCHE_INVERSE ? !sensGaucheAvant : sensGaucheAvant;
+  bool dirD = MOTEUR_DROIT_INVERSE  ? !sensDroitAvant  : sensDroitAvant;
+
+
+  // === MOTEUR GAUCHE ===
+  ledcDetachPin(IN1_G);
+ ledcDetachPin(IN2_G);
+
+
+  if (dirG) {
+    digitalWrite(IN1_G, HIGH);
+    digitalWrite(IN2_G, LOW);
+    ledcAttachPin(IN1_G, CH_G);
+  } else {
+    digitalWrite(IN1_G, LOW);
+    digitalWrite(IN2_G, HIGH);
+    ledcAttachPin(IN2_G, CH_G);
+  }
+  ledcWrite(CH_G, pwmG);
+
+
+  // === MOTEUR DROIT ===
+  ledcDetachPin(IN1_D);
+  ledcDetachPin(IN2_D);
+
+
+  if (dirD) {
+    digitalWrite(IN1_D, HIGH);
+    digitalWrite(IN2_D, LOW);
+    ledcAttachPin(IN1_D, CH_D);
+  } else {
+    digitalWrite(IN1_D, LOW);
+    digitalWrite(IN2_D, HIGH);
+    ledcAttachPin(IN2_D, CH_D);
+  }
+  ledcWrite(CH_D, pwmD);
+}
+
+
+void rotateInPlace() {
+  setMoteur(false, 75, true, 75);  // gauche avant, droite arrière
+}
+
+void stopMotorsD(){
+  setMoteur(true, 0, true, 0);
+}
+
+void stopMotors() {
+  // Étape 0 : Stop de sécurité
+  for (int ch = 0; ch < 4; ch++) {
+    ledcWrite(ch, 0);
+  }
+  delay(500);
+
+  // === 1. Avancer (tige de la flèche) ===
+  setMoteur(true, 75, true, 75);
+  delay(700);
+  stopMotorsD();
+
+  // === 2. Arc vers la gauche (entrée de la pointe) ===
+  setMoteur(false, 60, true, 100);  // rotation gauche
+  delay(300);
+  stopMotorsD();
+
+  // === 3. Long arc vers la droite (pointe principale) ===
+  setMoteur(true, 100, false, 60);  // rotation droite
+  delay(850);
+  stopMotorsD();
+
+  // === 4. Arc vers la gauche EN RECULANT (fermeture de la pointe) ===
+  setMoteur(false, 170, false, 85);  // rotation gauche EN ARRIÈRE
+  delay(300);
+  stopMotorsD();
+  delay(1000);
+  // === 5. Recul final pour affiner la flèche ===
+  setMoteur(false, 50, false, 145);  // recule droit
+  delay(300);
+  stopMotorsD();
+
+  // Pause d'observation
+  delay(10000);
+}
+
+void loop() {
+  sensors_event_t mag;
+  lis3mdl.getEvent(&mag);
+
+  float mx = mag.magnetic.x - mag_offset_x;
+  float my = mag.magnetic.y - mag_offset_y;
+
+  float heading = atan2(my, mx) * 180.0 / PI;
+  heading -= ORIENTATION_OFFSET_DEGRES;
+
+  if (heading < 0) heading += 360;
+  if (heading >= 360) heading -= 360;
+
+  Serial.print("🧭 Cap corrigé : ");
+  Serial.print(heading, 1);
+  Serial.print(" °  |  Direction : ");
+  Serial.println(getCardinal(heading));
+
+  // ✅ Condition pour être "face au Nord"
+    // ✅ Condition pour être "face au Nord"
+  if (isHeadingNorth(heading)) {
+    stopMotors();
+    Serial.println("✅ Aligné vers le Nord !");
+  } else {
+    rotateInPlace();
+  }
+
+
+  delay(20);
+}
+
+
+void calibrateMagnetometer() {
+  Serial.println("📏 CALIBRATION EN COURS : Tournez lentement le robot...");
+
+  float min_x = 1000, max_x = -1000;
+  float min_y = 1000, max_y = -1000;
+
+  unsigned long t0 = millis();
+  while (millis() - t0 < 10000) {
+    sensors_event_t mag;
+    lis3mdl.getEvent(&mag);
+
+    min_x = min(min_x, mag.magnetic.x);
+    max_x = max(max_x, mag.magnetic.x);
+    min_y = min(min_y, mag.magnetic.y);
+    max_y = max(max_y, mag.magnetic.y);
+
+    delay(50);
+  }
+
+  mag_offset_x = (max_x + min_x) / 2.0;
+  mag_offset_y = (max_y + min_y) / 2.0;
+
+  Serial.println("✅ Calibration terminée.");
+  Serial.print("Offset X: "); Serial.println(mag_offset_x, 2);
+  Serial.print("Offset Y: "); Serial.println(mag_offset_y, 2);
+
+  EEPROM.put(EEPROM_OFFSET_ADDR, mag_offset_x);
+  EEPROM.put(EEPROM_OFFSET_ADDR + sizeof(float), mag_offset_y);
+  EEPROM.commit();
+
+  Serial.println("📦 Offsets sauvegardés.");
+}
+
+String getCardinal(float heading) {
+  if (heading >= 337.5 || heading < 22.5)   return "Nord";
+  if (heading >= 22.5 && heading < 67.5)    return "Nord-Ouest";
+  if (heading >= 67.5 && heading < 112.5)   return "Ouest";
+  if (heading >= 112.5 && heading < 157.5)  return "Sud-Ouest";
+  if (heading >= 157.5 && heading < 202.5)  return "Sud";
+  if (heading >= 202.5 && heading < 247.5)  return "Sud-Est";
+  if (heading >= 247.5 && heading < 292.5)  return "Est";
+  return "Nord-Est";
+}
+
+bool isHeadingNorth(float heading) {
+  return (heading >= 355.0 || heading <= 5.0);
+}

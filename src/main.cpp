@@ -19,7 +19,12 @@ void setup() {
   Enable_IMU();
   //Magneto
   Enable_MAG();
+  //EEPROM
+  initialize_EEPROM();
 }
+
+float mag_offset_x = 0;
+float mag_offset_y = 0;
 
 int consigne_dist;
 int consigne_angle;

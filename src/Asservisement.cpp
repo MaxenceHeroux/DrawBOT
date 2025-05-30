@@ -372,30 +372,55 @@ void Discretiser(){
             break;
         } 
         case 6:{  //Flèche
-            //TODO Trouver le Nord
+            //Magneto
+            sensors_event_t mag;
+            lis3mdl.getEvent(&mag);
 
-            int taille_lignes_consigne_fleche = 5;
+            float mx = mag.magnetic.x - mag_offset_x;
+            float my = mag.magnetic.y - mag_offset_y;
+
+            float heading = atan2(my, mx) * 180.0 / PI;
+            heading -= ORIENTATION_OFFSET_DEGRES;
+
+            if (heading < 0) heading += 360;
+            if (heading >= 360) heading -= 360;
+
+            Serial.print("Cap corrigé : ");
+            Serial.print(heading, 1);
+            Serial.print(" °  |  Direction : ");
+            Serial.println(getCardinal(heading));
+
+            // Condition pour être "face au Nord"
+                // Condition pour être "face au Nord"
+            if (isHeadingNorth(heading)) {
+                stopMotors();
+                Serial.println("Aligné vers le Nord !");
+            } else {
+                rotateInPlace();
+            }
+            //////////////////////////////////////Code d'avant pour le flèche////////////////////////////////////
+            /*int taille_lignes_consigne_fleche = 5;
             float tab_consignes_fleche[taille_lignes_consigne_fleche][2] = {
                 {0, 0},
                 {60, 0},
                 {40, -10},
                 {40, 10},
                 {60, 0}
-            };
+            };*/
 
             //Pour un départ à (0, 0) :
             // consigne_pos_X = tab_consignes_fleche[i][0]; //Colonne 0 pour les x
             // consigne_pos_Y = tab_consignes_fleche[i][1]; //Colonne 1 pour les y
             
             // Pour n'importe quelle coordonnées :
-            consigne_pos_X = x0 + tab_consignes_fleche[i][0]; //Colonne 0 pour les x
+            /*consigne_pos_X = x0 + tab_consignes_fleche[i][0]; //Colonne 0 pour les x
             consigne_pos_Y = y0 + tab_consignes_fleche[i][1]; //Colonne 1 pour les y
 
             if(i >= taille_lignes_consigne_fleche-1){
                 mode = 0; //arret
                 i = 0;
                 first_call = true;
-            }
+            }*/ ///////////////////////////////////////////////////////////////////////////////////////////////////
             break;
         } 
         default:{
@@ -404,4 +429,88 @@ void Discretiser(){
             break;
         }
     }
+}
+
+void setMoteur(bool sensGaucheAvant, int pwmG, bool sensDroitAvant, int pwmD) {
+  bool dirG = MOTEUR_GAUCHE_INVERSE ? !sensGaucheAvant : sensGaucheAvant;
+  bool dirD = MOTEUR_DROIT_INVERSE  ? !sensDroitAvant  : sensDroitAvant;
+
+
+  // === MOTEUR GAUCHE ===
+  ledcDetachPin(IN_1_G);
+  ledcDetachPin(IN_2_G);
+
+
+  if (dirG) {
+    digitalWrite(IN_1_G, HIGH);
+    digitalWrite(IN_2_G, LOW);
+    ledcAttachPin(IN_1_G, CH_G);
+  } else {
+    digitalWrite(IN_1_G, LOW);
+    digitalWrite(IN_2_G, HIGH);
+    ledcAttachPin(IN_2_G, CH_G);
+  }
+  ledcWrite(CH_G, pwmG);
+
+
+  // === MOTEUR DROIT ===
+  ledcDetachPin(IN_1_D);
+  ledcDetachPin(IN_2_D);
+
+
+  if (dirD) {
+    digitalWrite(IN_1_D, HIGH);
+    digitalWrite(IN_2_D, LOW);
+    ledcAttachPin(IN_1_D, CH_D);
+  } else {
+    digitalWrite(IN_1_D, LOW);
+    digitalWrite(IN_2_D, HIGH);
+    ledcAttachPin(IN_2_D, CH_D);
+  }
+  ledcWrite(CH_D, pwmD);
+}
+
+
+void rotateInPlace() {
+  setMoteur(false, 75, true, 75);  // gauche avant, droite arrière
+}
+
+void stopMotorsD(){
+  setMoteur(true, 0, true, 0);
+}
+
+void stopMotors() {
+  // Étape 0 : Stop de sécurité
+  for (int ch = 0; ch < 4; ch++) {
+    ledcWrite(ch, 0);
+  }
+  delay(500);
+
+  // === 1. Avancer (tige de la flèche) ===
+  setMoteur(true, 75, true, 75);
+  delay(700);
+  stopMotorsD();
+
+  // === 2. Arc vers la gauche (entrée de la pointe) ===
+  setMoteur(false, 60, true, 100);  // rotation gauche
+  delay(300);
+  stopMotorsD();
+
+  // === 3. Long arc vers la droite (pointe principale) ===
+  setMoteur(true, 100, false, 60);  // rotation droite
+  delay(850);
+  stopMotorsD();
+
+  // === 4. Arc vers la gauche EN RECULANT (fermeture de la pointe) ===
+  setMoteur(false, 170, false, 85);  // rotation gauche EN ARRIÈRE
+  delay(300);
+  stopMotorsD();
+  delay(1000);
+  // === 5. Recul final pour affiner la flèche ===
+  setMoteur(false, 50, false, 145);  // recule droit
+  delay(300);
+  stopMotorsD();
+
+  // Pause d'observation
+  delay(10000);
 }

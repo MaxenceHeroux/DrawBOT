@@ -84,8 +84,53 @@ extern float Kd_dist;
 extern LSM6DS3 myIMU;
 
 //Magneto
-#include <LIS3MDL.h>
-extern LIS3MDL mag;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include <Adafruit_LIS3MDL.h>
+#include <Adafruit_Sensor.h>
+#include <EEPROM.h>
+
+// === I2C pour ESP32 ===
+#define SDA_I2C 21
+#define SCL_I2C 22
+#define ADDR_MAG 0x1E
+
+
+#define PWM_FREQ 5000
+#define PWM_RES 8
+
+
+//Moteurs
+#define CH_G 0
+#define CH_D 1
+// === INVERSION DES MOTEURS (1 = inversé, 0 = normal) ===
+#define MOTEUR_GAUCHE_INVERSE 0
+#define MOTEUR_DROIT_INVERSE  1  // inverse ici si nécessaire
+
+
+
+//Capteur magnétomètre
+#define ORIENTATION_OFFSET_DEGRES -90
+
+extern Adafruit_LIS3MDL lis3mdl;
+extern float mag_offset_x = 0;
+extern float mag_offset_y = 0;
+
+
+//EEPROM
+#define EEPROM_OFFSET_ADDR 0
+#define EEPROM_SIZE 16
+
+void initialize_EEPROM(void);
+void calibrateMagnetometer();
+String getCardinal(float heading);
+bool isHeadingNorth(float heading);
+void setMoteur(bool sensGaucheAvant, int pwmG, bool sensDroitAvant, int pwmD);
+void rotateInPlace();
+void stopMotorsD();
+void stopMotors();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 //fonctions.cpp
 int signe(int val);
