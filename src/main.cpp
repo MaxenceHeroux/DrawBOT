@@ -1,6 +1,6 @@
 #include <lib.h>
 
-#define TEMPS_AVANT_START  85 //85 //TODO COMPETITION
+#define TEMPS_AVANT_START  1 //85 //TODO COMPETITION
 #define TEMPS_APRES_START 15
 #define MICROSWITCH_PIN 15
 #define PIN_SERVO 12
@@ -20,11 +20,11 @@ struct Point {
   float Y;
 };
 
-const int nb_de_point = 3; //TODO TAILLE A CHANGER 
+const int nb_de_point = 4; //TODO TAILLE A CHANGER 
 
 Point tableau_points[nb_de_point]; 
 
-#define ZONE 3 //TODO pour le delay
+#define ZONE 1 //TODO pour le delay
 
 // //SCENE 
 // Point tableau_pointsJ[4] = {
@@ -35,49 +35,51 @@ Point tableau_points[nb_de_point];
 // };
 // Point tableau_pointsB[4] = {
 //   {0.0, 0.0},
-//   {1500.0, -100},
-//   {1600.0, -550},  
-//   {1800.0, -600} 
+//   {1500.0, -200},
+//   {1600.0, -650},  
+//   {1800.0, -700} 
 // };
 
 // ZONE2
-// Point tableau_pointsJ[4] = {
-//   {0.0, 0.0},
-//   {350, 300},
-//   {500, 400},
-//   {1250, 550}
-// };
-// Point tableau_pointsB[4] = {
-//   {0.0, 0.0},
-//   {350, -300},
-//   {500, -400},
-//   {1250, -550}
-// };
+Point tableau_pointsJ[4] = {
+  {0.0, 0.0},
+  {350, 300},
+  {500, 400},
+  {1250, 550}
+};
+Point tableau_pointsB[4] = {
+  {0.0, 0.0},
+  {100, 0},
+  {100, -700},
+  {1400, -600}
+};
 
 
 //ZONE3
-Point tableau_pointsJ[3] = {
-  {0.0, 0.0},
-  {600, 400},
-  {1800, 550}
-};
-Point tableau_pointsB[3] = {
-  {0.0, 0.0},
-  {600, -400},
-  {1800, -550}
-};
-
-// //ZONE4 (10)
 // Point tableau_pointsJ[3] = {
-//   {400, 400},
-//   {2500, 550},
-//   {2500, 300}
+//   {0.0, 0.0},
+//   {600, 400},
+//   {1800, 550}
+// };
+// Point tableau_pointsB[3] = {
+//   {0.0, 0.0},
+//   {600, -400},
+//   {1800, -550}
 // };
 
-// Point tableau_pointsB[3] = {
-//   {400, -400},
-//   {2500, -550},
-//   {2500, -300}
+// //ZONE4 (10)
+// Point tableau_pointsJ[4] = {
+//   {0, 0},
+//   {600, 550},
+//   {2000, 650},
+//   {3000, 400}
+// };
+
+// Point tableau_pointsB[4] = {
+//   {0, 0},
+//   {600, -550},
+//   {2000, -650},
+//   {3000, -400}
 // };
 
 
@@ -123,7 +125,7 @@ void setup() {
   //PAMIS
   delay(TEMPS_AVANT_START*1000);
   delay(4000*(1/(float)ZONE));
-  // delay(1000);
+  delay(1000);
 
   if(isBleu){
     memcpy(tableau_points, tableau_pointsB, sizeof(tableau_points));
