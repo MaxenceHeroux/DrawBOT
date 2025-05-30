@@ -102,8 +102,8 @@ extern LSM6DS3 myIMU;
 #define ORIENTATION_OFFSET_DEGRES -90
 
 extern Adafruit_LIS3MDL lis3mdl;
-extern float mag_offset_x = 0;
-extern float mag_offset_y = 0;
+extern float mag_offset_x;
+extern float mag_offset_y;
 
 
 //EEPROM
