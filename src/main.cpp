@@ -1,6 +1,9 @@
 #include <lib.h>
 
-#define TEMPS_AVANT_START 15
+#define TEMPS_AVANT_START  1 //85
+#define TEMPS_APRES_START 15
+#define MICROSWITCH_PIN 15
+#define PIN_SERVO 12
 
 int consigne_dist;
 int consigne_angle;
@@ -9,26 +12,64 @@ float consigne_pos_X =0, consigne_pos_Y =0;
 float pos_X =-DIST_STYLO, pos_Y =0; 
 
 int i =0;
+int temps =0;
+bool isBleu = false;
 
 struct Point {
   float X;
   float Y;
 };
+Point tableau_points[3];
 
+#define ZONE 1 //pour le delay
 //SCENE
-Point tableau_points[3] = {
+Point tableau_pointsJ[3] = {
+  {1100.0, 100},
+  {1500.0, 50},
+  {1500.0, 350}
+};
+Point tableau_pointsB[3] = {
   {0.0, 0.0},
-  {1400.0, 150},
-  {1700.0, 550}
+  {1400.0, -150},
+  {1700.0, -550}
 };
 
 //ZONE1
-// Point tableau_points[3] = {
+// Point tableau_pointsJ[3] = {
 //   {0.0, 0.0},
-//   {600, 550},
+//   {600, 500},
 //   {1050, 550}
 // };
+// Point tableau_pointsB[3] = {
+//   {0.0, 0.0},
+//   {600, -500},
+//   {1050, -550}
+// };
 
+//ZONE2
+// Point tableau_pointsJ[3] = {
+//   {0.0, 0.0},
+//   {600, 400},
+//   {1800, 550}
+// };
+// Point tableau_pointsB[3] = {
+//   {0.0, 0.0},
+//   {600, -400},
+//   {1800, -550}
+// };
+
+//ZONE3
+// Point tableau_pointsJ[3] = {
+//   {600, 300},
+//   {1300, 450},
+//   {2500, 200}
+// };
+
+// Point tableau_pointsB[3] = {
+//   {600, -300},
+//   {1300, -450},
+//   {2500, -200}
+// };
 
 
 void setup() {
@@ -51,15 +92,40 @@ void setup() {
   //Magneto
   Enable_MAG();
 
+  //PAMIS------------------------
+  if (myIMU.readFloatAccelY() >0){
+    isBleu = true; // on est en mode bleu
+    Serial.println("Mode BLEU");
+    digitalWrite(LEDU1, LOW); // on allume la led 1
+    digitalWrite(LEDU2, HIGH); // on éteint la led 2
+  }else{
+    isBleu = false; // on est en mode jaune
+    Serial.println("Mode JAUNE");
+    digitalWrite(LEDU1, HIGH); // on allume la led 1
+    digitalWrite(LEDU2, LOW); // on éteint la led 2
+  }
+  //SERVO
+  ledcSetup(0, 5000, 8);
+  ledcAttachPin(PIN_SERVO, 0);
+  //TIRETTE
+  while(digitalRead(MICROSWITCH_PIN)) { 
+    delay(1);
+  }
   //PAMIS
-  // delay(85000);
+  delay(TEMPS_AVANT_START*1000);
+  delay(4000*(1/ZONE));
+
+  if(isBleu){
+    memcpy(tableau_points, tableau_pointsB, sizeof(tableau_points));
+  }else{
+    memcpy(tableau_points, tableau_pointsJ, sizeof(tableau_points));
+  }
 
   consigne_pos_X = tableau_points[0].X;
   consigne_pos_Y = tableau_points[0].Y;
 
-  // long int temps = millis();
+  temps = millis();
 }
-
 
 
 void loop() {
@@ -68,6 +134,25 @@ void loop() {
   
   int Commande_MD =0, Commande_MG =0;
 
+  //COLISION
+  while(digitalRead(MICROSWITCH_PIN) == HIGH){
+    PWM('D',0);
+    PWM('G',0);
+    delay(1);
+    
+    //OUT OF TIME
+    if((millis()-temps)>TEMPS_APRES_START*1000){
+      while(1){
+        digitalWrite(LEDU2, HIGH);
+        Disable_moteur();
+        //SERVO
+        ledcWrite(0, 128); // 50% duty
+        delay(1000);
+      }
+    }
+  }
+
+  //CHECK POINT 
   if(abs(consigne_dist) <20){ 
     i++;
     digitalWrite(LEDU1, HIGH);
@@ -76,8 +161,12 @@ void loop() {
   
     if(i>=3) {
       while(1){
+        //OUT OF TIME
         digitalWrite(LEDU2, HIGH);
         Disable_moteur();
+        //SERVO
+        ledcWrite(0, 128); // 50% duty
+        delay(1000);           
       }
     }
     // Discretiser(50, 20, i); //modifie les consignes    
