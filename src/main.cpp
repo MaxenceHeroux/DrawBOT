@@ -1,6 +1,6 @@
 #include <lib.h>
 
-#define TEMPS_AVANT_START  1 //85
+#define TEMPS_AVANT_START  1 //85 //TODO COMPETITION
 #define TEMPS_APRES_START 15
 #define MICROSWITCH_PIN 15
 #define PIN_SERVO 12
@@ -19,19 +19,25 @@ struct Point {
   float X;
   float Y;
 };
-Point tableau_points[3];
 
-#define ZONE 1 //pour le delay
+const int nb_de_point = 4; //TODO TAILLE A CHANGER 
+
+Point tableau_points[nb_de_point]; 
+
+#define ZONE 1 //TODO pour le delay
+
 //SCENE
-Point tableau_pointsJ[3] = {
-  {1100.0, 100},
-  {1500.0, 50},
-  {1500.0, 350}
-};
-Point tableau_pointsB[3] = {
+Point tableau_pointsJ[4] = {
   {0.0, 0.0},
-  {1400.0, -150},
-  {1700.0, -550}
+  {1500.0, 100},
+  {1600.0, 550},  
+  {1800.0, 600} 
+};
+Point tableau_pointsB[4] = {
+  {0.0, 0.0},
+  {1500.0, -100},
+  {1600.0, -550},  
+  {1800.0, -600} 
 };
 
 //ZONE1
@@ -45,6 +51,7 @@ Point tableau_pointsB[3] = {
 //   {600, -500},
 //   {1050, -550}
 // };
+
 
 //ZONE2
 // Point tableau_pointsJ[3] = {
@@ -159,7 +166,7 @@ void loop() {
     consigne_pos_X = tableau_points[i].X;
     consigne_pos_Y = tableau_points[i].Y;
   
-    if(i>=3) {
+    if(i>=(nb_de_point)) { //taille du tableau 
       while(1){
         //OUT OF TIME
         digitalWrite(LEDU2, HIGH);
@@ -185,7 +192,7 @@ void loop() {
 
   Get_angle();
   
-  Tourner(consigne_angle, 10, 0.5, 0);   //FIXME : regler coeff et caper les pid I
+  Tourner(consigne_angle, 10, 0, 4);   //FIXME : regler coeff et caper les pid I
   Avancer(consigne_dist, 1,0.1,0); 
   
   delay(10); //attention a ne pas retirer !
