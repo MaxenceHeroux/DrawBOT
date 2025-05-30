@@ -393,6 +393,9 @@ void Discretiser(){
             // Condition pour être "face au Nord"
                 // Condition pour être "face au Nord"
             if (isHeadingNorth(heading)) {
+                mode = 0;
+                i = 0;
+                first_call = true;
                 stopMotors();
                 Serial.println("Aligné vers le Nord !");
             } else {
