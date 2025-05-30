@@ -88,9 +88,9 @@ void IRAM_ATTR ENC_ISIR_D() {
   
     // Si A a changé, on regarde B pour le sens
     if (A == B) {
-        nb_tic_encodeur_D++;    // Sens avant
+        nb_tic_encodeur_D--;    // Sens avant
     } else {
-        nb_tic_encodeur_D--;    // Sens arrière
+        nb_tic_encodeur_D++;    // Sens arrière
     }
 }
 
@@ -100,9 +100,9 @@ void IRAM_ATTR ENC_ISIR_G() {
   
     // Si A a changé, on regarde B pour le sens
     if (A == B) {
-        nb_tic_encodeur_G--;    // Sens arrière
+        nb_tic_encodeur_G++;    // Sens arrière
     } else {
-        nb_tic_encodeur_G++;    // Sens avant
+        nb_tic_encodeur_G--;    // Sens avant
     }
 }
 

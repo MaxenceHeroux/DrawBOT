@@ -1,5 +1,36 @@
 #include <lib.h>
 
+#define TEMPS_AVANT_START 15
+
+int consigne_dist;
+int consigne_angle;
+
+float consigne_pos_X =0, consigne_pos_Y =0;
+float pos_X =-DIST_STYLO, pos_Y =0; 
+
+int i =0;
+
+struct Point {
+  float X;
+  float Y;
+};
+
+//SCENE
+Point tableau_points[3] = {
+  {0.0, 0.0},
+  {1400.0, 150},
+  {1700.0, 550}
+};
+
+//ZONE1
+// Point tableau_points[3] = {
+//   {0.0, 0.0},
+//   {600, 550},
+//   {1050, 550}
+// };
+
+
+
 void setup() {
   Serial.begin(9600);
   //LED
@@ -19,15 +50,17 @@ void setup() {
   Enable_IMU();
   //Magneto
   Enable_MAG();
+
+  //PAMIS
+  // delay(85000);
+
+  consigne_pos_X = tableau_points[0].X;
+  consigne_pos_Y = tableau_points[0].Y;
+
+  // long int temps = millis();
 }
 
-int consigne_dist;
-int consigne_angle;
 
-float consigne_pos_X =0, consigne_pos_Y =0;
-float pos_X =-DIST_STYLO, pos_Y =0; 
-
-int i =0;
 
 void loop() {
   server.handleClient(); //rafraichissement handler (server wifi)
@@ -35,12 +68,19 @@ void loop() {
   
   int Commande_MD =0, Commande_MG =0;
 
-  if(abs(consigne_dist) <5){ //&& abs(consigne_angle) <10
+  if(abs(consigne_dist) <20){ 
     i++;
     digitalWrite(LEDU1, HIGH);
-    
-    if(i>=20) i=20;
-    Discretiser(50, 20, i); //modifie les consignes    
+    consigne_pos_X = tableau_points[i].X;
+    consigne_pos_Y = tableau_points[i].Y;
+  
+    if(i>=3) {
+      while(1){
+        digitalWrite(LEDU2, HIGH);
+        Disable_moteur();
+      }
+    }
+    // Discretiser(50, 20, i); //modifie les consignes    
 
     Reset_pid_distance();
     Reset_pid_angle();
@@ -56,13 +96,8 @@ void loop() {
 
   Get_angle();
   
-  //PID sol
-  // Tourner(consigne_angle, 5, 0, 0);   //FIXME : regler coeff et caper les pid I
-  // Avancer(consigne_dist, 1,0, 0.05);
-  
-  //PID ardoise
-  Tourner(consigne_angle, 5, 0.02, 0);   //FIXME : regler coeff et caper les pid I
-  Avancer(consigne_dist, 2,0.1,0.5); 
+  Tourner(consigne_angle, 10, 0.5, 0);   //FIXME : regler coeff et caper les pid I
+  Avancer(consigne_dist, 1,0.1,0); 
   
   delay(10); //attention a ne pas retirer !
 

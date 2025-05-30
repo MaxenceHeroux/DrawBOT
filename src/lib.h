@@ -19,14 +19,14 @@
 extern float pos_X , pos_Y;
 
 // Enable moteurs droit et gauche
-#define EN_D 23
-#define EN_G 4
+#define EN_G 23
+#define EN_D 4
 // Commande PWM moteur droit
-#define IN_1_D 19
-#define IN_2_D 18            
+#define IN_1_G 19
+#define IN_2_G 18            
 // Commande PWM moteur gauche
-#define IN_1_G 17
-#define IN_2_G 16            
+#define IN_1_D 17
+#define IN_2_D 16            
 const int pwmChannel_MD_1 = 0;  // canal PWM pour ESP32
 const int pwmChannel_MD_2 = 1;  // canal PWM pour ESP32
 const int pwmChannel_MG_1 = 2;  // canal PWM pour ESP32

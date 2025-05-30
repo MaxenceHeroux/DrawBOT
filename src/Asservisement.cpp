@@ -88,7 +88,7 @@ float Get_angle(){
     long delta_D = nb_tic_encodeur_D - nb_tic_encodeur_D_prec;
     long delta_G = nb_tic_encodeur_G - nb_tic_encodeur_G_prec;
 
-    float deltaAngle = (delta_D - delta_G) / facteurAngle;      // en radians
+    float deltaAngle = (delta_D - delta_G) / facteurAngle*0.5;      // en radians
     anglerobot += deltaAngle;
     anglerobot = Angle_restriction(anglerobot);
 
@@ -119,7 +119,7 @@ int Tourner (int angle, float KP, float KI, float KD){
     commande_rot = KP * erreur_rot + KI * I_erreur_rot + KD * D_erreur_rot;
     
     //cap la valeur max a la vitesse max
-    commande_pwm_angle_MD = constrain(abs(commande_rot), 0, HIGHTEST_PWM) * signe(commande_rot); 
+    commande_pwm_angle_MD = constrain(abs(commande_rot), 0, HIGHTEST_PWM) * signe(-commande_rot); 
     commande_pwm_angle_MG = - commande_pwm_angle_MD;
     //TODO kick start
 
