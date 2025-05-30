@@ -85,19 +85,6 @@ extern LSM6DS3 myIMU;
 
 //Magneto
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include <Adafruit_LIS3MDL.h>
-#include <Adafruit_Sensor.h>
-#include <EEPROM.h>
-
-// === I2C pour ESP32 ===
-#define SDA_I2C 21
-#define SCL_I2C 22
-#define ADDR_MAG 0x1E
-
-
-#define PWM_FREQ 5000
-#define PWM_RES 8
-
 
 //Moteurs
 #define CH_G 0
@@ -109,6 +96,9 @@ extern LSM6DS3 myIMU;
 
 
 //Capteur magnétomètre
+#include <Adafruit_LIS3MDL.h>
+#include <Adafruit_Sensor.h>
+
 #define ORIENTATION_OFFSET_DEGRES -90
 
 extern Adafruit_LIS3MDL lis3mdl;
@@ -117,6 +107,8 @@ extern float mag_offset_y = 0;
 
 
 //EEPROM
+#include <EEPROM.h>
+
 #define EEPROM_OFFSET_ADDR 0
 #define EEPROM_SIZE 16
 
