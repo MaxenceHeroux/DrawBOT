@@ -189,68 +189,68 @@ void DEBUG_angle(void){
     Serial.println(Find_angle());
 }
 
-Adafruit_LIS3MDL lis3mdl;
-void Enable_MAG (void){  //calibration : min: { -4750,  -2345,  -1612}   max: {  -773,  +2753,  +3158}    
-    if (!lis3mdl.begin_I2C(ADDR_MAG)) {
-        Serial.println("LIS3MDL non détecté !");
-        //while (1);
-    } else {
-        Serial.println("LIS3MDL détecté");
+// Adafruit_LIS3MDL lis3mdl;
+// void Enable_MAG (void){  //calibration : min: { -4750,  -2345,  -1612}   max: {  -773,  +2753,  +3158}    
+//     if (!lis3mdl.begin_I2C(ADDR_MAG)) {
+//         Serial.println("LIS3MDL non détecté !");
+//         //while (1);
+//     } else {
+//         Serial.println("LIS3MDL détecté");
 
-        lis3mdl.setPerformanceMode(LIS3MDL_MEDIUMMODE);
-        lis3mdl.setOperationMode(LIS3MDL_CONTINUOUSMODE);
-        lis3mdl.setDataRate(LIS3MDL_DATARATE_155_HZ);  //constante valide
-        lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS);
-    }
-}
+//         lis3mdl.setPerformanceMode(LIS3MDL_MEDIUMMODE);
+//         lis3mdl.setOperationMode(LIS3MDL_CONTINUOUSMODE);
+//         lis3mdl.setDataRate(LIS3MDL_DATARATE_155_HZ);  //constante valide
+//         lis3mdl.setRange(LIS3MDL_RANGE_4_GAUSS);
+//     }
+// }
 
-void calibrateMagnetometer() {
-    Serial.println("CALIBRATION EN COURS : Tournez lentement le robot...");
+// void calibrateMagnetometer() {
+//     Serial.println("CALIBRATION EN COURS : Tournez lentement le robot...");
 
-    float min_x = 1000, max_x = -1000;
-    float min_y = 1000, max_y = -1000;
+//     float min_x = 1000, max_x = -1000;
+//     float min_y = 1000, max_y = -1000;
 
-    unsigned long t0 = millis();
-    while (millis() - t0 < 10000) {
-        sensors_event_t mag;
-        lis3mdl.getEvent(&mag);
+//     unsigned long t0 = millis();
+//     while (millis() - t0 < 10000) {
+//         sensors_event_t mag;
+//         lis3mdl.getEvent(&mag);
 
-        min_x = min(min_x, mag.magnetic.x);
-        max_x = max(max_x, mag.magnetic.x);
-        min_y = min(min_y, mag.magnetic.y);
-        max_y = max(max_y, mag.magnetic.y);
+//         min_x = min(min_x, mag.magnetic.x);
+//         max_x = max(max_x, mag.magnetic.x);
+//         min_y = min(min_y, mag.magnetic.y);
+//         max_y = max(max_y, mag.magnetic.y);
 
-        delay(50);
-    }
+//         delay(50);
+//     }
 
-    mag_offset_x = (max_x + min_x) / 2.0;
-    mag_offset_y = (max_y + min_y) / 2.0;
+//     mag_offset_x = (max_x + min_x) / 2.0;
+//     mag_offset_y = (max_y + min_y) / 2.0;
 
-    Serial.println("Calibration terminée.");
-    Serial.print("Offset X: "); Serial.println(mag_offset_x, 2);
-    Serial.print("Offset Y: "); Serial.println(mag_offset_y, 2);
+//     Serial.println("Calibration terminée.");
+//     Serial.print("Offset X: "); Serial.println(mag_offset_x, 2);
+//     Serial.print("Offset Y: "); Serial.println(mag_offset_y, 2);
 
-    EEPROM.put(EEPROM_OFFSET_ADDR, mag_offset_x);
-    EEPROM.put(EEPROM_OFFSET_ADDR + sizeof(float), mag_offset_y);
-    EEPROM.commit();
+//     EEPROM.put(EEPROM_OFFSET_ADDR, mag_offset_x);
+//     EEPROM.put(EEPROM_OFFSET_ADDR + sizeof(float), mag_offset_y);
+//     EEPROM.commit();
 
-    Serial.println("Offsets sauvegardés.");
-}
+//     Serial.println("Offsets sauvegardés.");
+// }
 
-String getCardinal(float heading) {
-  if (heading >= 337.5 || heading < 22.5)   return "Nord";
-  if (heading >= 22.5 && heading < 67.5)    return "Nord-Ouest";
-  if (heading >= 67.5 && heading < 112.5)   return "Ouest";
-  if (heading >= 112.5 && heading < 157.5)  return "Sud-Ouest";
-  if (heading >= 157.5 && heading < 202.5)  return "Sud";
-  if (heading >= 202.5 && heading < 247.5)  return "Sud-Est";
-  if (heading >= 247.5 && heading < 292.5)  return "Est";
-  return "Nord-Est";
-}
+// String getCardinal(float heading) {
+//   if (heading >= 337.5 || heading < 22.5)   return "Nord";
+//   if (heading >= 22.5 && heading < 67.5)    return "Nord-Ouest";
+//   if (heading >= 67.5 && heading < 112.5)   return "Ouest";
+//   if (heading >= 112.5 && heading < 157.5)  return "Sud-Ouest";
+//   if (heading >= 157.5 && heading < 202.5)  return "Sud";
+//   if (heading >= 202.5 && heading < 247.5)  return "Sud-Est";
+//   if (heading >= 247.5 && heading < 292.5)  return "Est";
+//   return "Nord-Est";
+// }
 
-bool isHeadingNorth(float heading) {
-  return (heading >= 355.0 || heading <= 5.0);
-}
+// bool isHeadingNorth(float heading) {
+//   return (heading >= 355.0 || heading <= 5.0);
+// }
 
 //////////////////////////////////////////////////////////Anciennes fonctions pour le mag//////////////////////////////////////////////////////////////
 /*void DEBUG_MAG(void){
@@ -277,12 +277,12 @@ void DEBUG_North (void){
     Serial.println(Find_north());
 }
 
-void initialize_EEPROM(void){
-    EEPROM.begin(EEPROM_SIZE);
-    EEPROM.get(EEPROM_OFFSET_ADDR, mag_offset_x);
-    EEPROM.get(EEPROM_OFFSET_ADDR + sizeof(float), mag_offset_y);
+// void initialize_EEPROM(void){
+//     EEPROM.begin(EEPROM_SIZE);
+//     EEPROM.get(EEPROM_OFFSET_ADDR, mag_offset_x);
+//     EEPROM.get(EEPROM_OFFSET_ADDR + sizeof(float), mag_offset_y);
 
-    Serial.println("Offsets chargés :");
-    Serial.print("  X : "); Serial.println(mag_offset_x, 2);
-    Serial.print("  Y : "); Serial.println(mag_offset_y, 2);
-}
+//     Serial.println("Offsets chargés :");
+//     Serial.print("  X : "); Serial.println(mag_offset_x, 2);
+//     Serial.print("  Y : "); Serial.println(mag_offset_y, 2);
+// }

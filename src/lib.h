@@ -85,6 +85,7 @@ extern LSM6DS3 myIMU;
 
 //Magneto
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void startRobot3();
 
 //Moteurs
 #define CH_G 0
@@ -101,25 +102,25 @@ extern LSM6DS3 myIMU;
 
 #define ORIENTATION_OFFSET_DEGRES -90
 
-extern Adafruit_LIS3MDL lis3mdl;
-extern float mag_offset_x;
-extern float mag_offset_y;
+// extern Adafruit_LIS3MDL lis3mdl;
+// extern float mag_offset_x;
+// extern float mag_offset_y;
 
 
-//EEPROM
-#include <EEPROM.h>
+// //EEPROM
+// #include <EEPROM.h>
 
-#define EEPROM_OFFSET_ADDR 0
-#define EEPROM_SIZE 16
+// #define EEPROM_OFFSET_ADDR 0
+// #define EEPROM_SIZE 16
 
-void initialize_EEPROM(void);
-void calibrateMagnetometer();
-String getCardinal(float heading);
-bool isHeadingNorth(float heading);
-void setMoteur(bool sensGaucheAvant, int pwmG, bool sensDroitAvant, int pwmD);
-void rotateInPlace();
-void stopMotorsD();
-void stopMotors();
+// void initialize_EEPROM(void);
+// void calibrateMagnetometer();
+// String getCardinal(float heading);
+// bool isHeadingNorth(float heading);
+// void setMoteur(bool sensGaucheAvant, int pwmG, bool sensDroitAvant, int pwmD);
+// void rotateInPlace();
+// void stopMotorsD();
+// void stopMotors();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -145,7 +146,7 @@ void DEBUG_IMU (void);
 float Find_angle (void);
 void Reset_angle_Z(void);
 void DEBUG_angle(void);
-void Enable_MAG (void);
+// void Enable_MAG (void);
 void DEBUG_MAG(void);
 float Find_north (void);
 void DEBUG_North (void);

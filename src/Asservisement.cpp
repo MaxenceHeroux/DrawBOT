@@ -1,4 +1,82 @@
- #include <lib.h>
+#include <lib.h>
+
+// Définition des pins I2C
+#define I2C_SDA 21
+#define I2C_SCL 22
+
+// Moteurs
+#define EN_D 23
+#define EN_G 4
+#define IN_1_D 19
+#define IN_2_D 18
+#define IN_1_G 17
+#define IN_2_G 16
+
+// Encodeurs
+#define ENC_G_CH_A 32
+#define ENC_D_CH_A 27
+
+// Constantes du robot
+#define diametre 90.0
+#define circomference (diametre * PI)
+#define distance_roue 83.0
+#define ticks_par_tour 1080.0
+#define MM_par_tick (circomference / ticks_par_tour)
+#define distance_stylo 140.0
+
+#define DECLINAISON_MAGNETIQUE 1.7833
+
+volatile long ticks_g = 0;
+volatile long ticks_d = 0;
+long last_ticks_g = 0;
+long last_ticks_d = 0;
+int vitesse = 140;
+float targetDistance = 0;
+float targetAngle = 0;
+bool isMoving = false;
+bool isRotating = false;
+
+enum EtatRobot {
+  REPOS,
+  MOVING_FORWARD,
+  ROTATING
+};
+
+
+
+
+
+
+EtatRobot currentState = REPOS;
+
+LSM6DS3 imu(I2C_MODE, 0x6B);
+Adafruit_LIS3MDL mag;
+
+float gyroZ = 0;
+float angleZ = 0;
+unsigned long lastGyroTime = 0;
+
+// PID pour la distance
+float kp_dist = 1.00; // à ajuster
+float kd_dist = 1.0; // à ajuster
+float ki_dist = 0.16; // à ajuster
+float lastErrorDist = 0;
+float integralDist = 0;
+
+
+// PID pour la correction directionnelle
+float kp_dir = 1.0; // Augmenté pour une correction plus rapide
+float ki_dir = 0.04; // Ajusté pour réduire les erreurs accumulées
+float kd_dir = 0.08; // Ajusté pour réduire les oscillations
+float lastErrorDir = 0;
+float integralDir = 0;
+
+float mag_offset2_x = 0;
+float mag_offset2_y = 0;
+float mag_scale_x = 1;
+float mag_scale_y = 1;
+bool calibrated = false;
+
 
 /*--------------------------------------------------------------------------------
   Variable utile : nb_tic_encodeur_D nb_tic_encodeur_G 
@@ -372,35 +450,39 @@ void Discretiser(){
             break;
         } 
         case 6:{  //Flèche
-            //Magneto
-            sensors_event_t mag;
-            lis3mdl.getEvent(&mag);
+            startRobot3();
+            // mode = 0;
+            // first_call = true;
+            // i=0;
+            // //Magneto code adrien 
+            // sensors_event_t mag;
+            // lis3mdl.getEvent(&mag);
 
-            float mx = mag.magnetic.x - mag_offset_x;
-            float my = mag.magnetic.y - mag_offset_y;
+            // float mx = mag.magnetic.x - mag_offset_x;
+            // float my = mag.magnetic.y - mag_offset_y;
 
-            float heading = atan2(my, mx) * 180.0 / PI;
-            heading -= ORIENTATION_OFFSET_DEGRES;
+            // float heading = atan2(my, mx) * 180.0 / PI;
+            // heading -= ORIENTATION_OFFSET_DEGRES;
 
-            if (heading < 0) heading += 360;
-            if (heading >= 360) heading -= 360;
+            // if (heading < 0) heading += 360;
+            // if (heading >= 360) heading -= 360;
 
-            Serial.print("Cap corrigé : ");
-            Serial.print(heading, 1);
-            Serial.print(" °  |  Direction : ");
-            Serial.println(getCardinal(heading));
+            // Serial.print("Cap corrigé : ");
+            // Serial.print(heading, 1);
+            // Serial.print(" °  |  Direction : ");
+            // Serial.println(getCardinal(heading));
 
-            // Condition pour être "face au Nord"
-                // Condition pour être "face au Nord"
-            if (isHeadingNorth(heading)) {
-                mode = 0;
-                i = 0;
-                first_call = true;
-                stopMotors();
-                Serial.println("Aligné vers le Nord !");
-            } else {
-                rotateInPlace();
-            }
+            // // Condition pour être "face au Nord"
+            //     // Condition pour être "face au Nord"
+            // if (isHeadingNorth(heading)) {
+            //     mode = 0;
+            //     i = 0;
+            //     first_call = true;
+            //     stopMotors();
+            //     Serial.println("Aligné vers le Nord !");
+            // } else {
+            //     rotateInPlace();
+            // }
             //////////////////////////////////////Code d'avant pour le flèche////////////////////////////////////
             /*int taille_lignes_consigne_fleche = 5;
             float tab_consignes_fleche[taille_lignes_consigne_fleche][2] = {
@@ -434,86 +516,86 @@ void Discretiser(){
     }
 }
 
-void setMoteur(bool sensGaucheAvant, int pwmG, bool sensDroitAvant, int pwmD) {
-  bool dirG = MOTEUR_GAUCHE_INVERSE ? !sensGaucheAvant : sensGaucheAvant;
-  bool dirD = MOTEUR_DROIT_INVERSE  ? !sensDroitAvant  : sensDroitAvant;
+// void setMoteur(bool sensGaucheAvant, int pwmG, bool sensDroitAvant, int pwmD) {
+//   bool dirG = MOTEUR_GAUCHE_INVERSE ? !sensGaucheAvant : sensGaucheAvant;
+//   bool dirD = MOTEUR_DROIT_INVERSE  ? !sensDroitAvant  : sensDroitAvant;
 
 
-  // === MOTEUR GAUCHE ===
-  ledcDetachPin(IN_1_G);
-  ledcDetachPin(IN_2_G);
+//   // === MOTEUR GAUCHE ===
+//   ledcDetachPin(IN_1_G);
+//   ledcDetachPin(IN_2_G);
 
 
-  if (dirG) {
-    digitalWrite(IN_1_G, HIGH);
-    digitalWrite(IN_2_G, LOW);
-    ledcAttachPin(IN_1_G, CH_G);
-  } else {
-    digitalWrite(IN_1_G, LOW);
-    digitalWrite(IN_2_G, HIGH);
-    ledcAttachPin(IN_2_G, CH_G);
-  }
-  ledcWrite(CH_G, pwmG);
+//   if (dirG) {
+//     digitalWrite(IN_1_G, HIGH);
+//     digitalWrite(IN_2_G, LOW);
+//     ledcAttachPin(IN_1_G, CH_G);
+//   } else {
+//     digitalWrite(IN_1_G, LOW);
+//     digitalWrite(IN_2_G, HIGH);
+//     ledcAttachPin(IN_2_G, CH_G);
+//   }
+//   ledcWrite(CH_G, pwmG);
 
 
-  // === MOTEUR DROIT ===
-  ledcDetachPin(IN_1_D);
-  ledcDetachPin(IN_2_D);
+//   // === MOTEUR DROIT ===
+//   ledcDetachPin(IN_1_D);
+//   ledcDetachPin(IN_2_D);
 
 
-  if (dirD) {
-    digitalWrite(IN_1_D, HIGH);
-    digitalWrite(IN_2_D, LOW);
-    ledcAttachPin(IN_1_D, CH_D);
-  } else {
-    digitalWrite(IN_1_D, LOW);
-    digitalWrite(IN_2_D, HIGH);
-    ledcAttachPin(IN_2_D, CH_D);
-  }
-  ledcWrite(CH_D, pwmD);
-}
+//   if (dirD) {
+//     digitalWrite(IN_1_D, HIGH);
+//     digitalWrite(IN_2_D, LOW);
+//     ledcAttachPin(IN_1_D, CH_D);
+//   } else {
+//     digitalWrite(IN_1_D, LOW);
+//     digitalWrite(IN_2_D, HIGH);
+//     ledcAttachPin(IN_2_D, CH_D);
+//   }
+//   ledcWrite(CH_D, pwmD);
+// }
 
 
-void rotateInPlace() {
-  setMoteur(false, 75, true, 75);  // gauche avant, droite arrière
-}
+// void rotateInPlace() {
+//   setMoteur(false, 75, true, 75);  // gauche avant, droite arrière
+// }
 
-void stopMotorsD(){
-  setMoteur(true, 0, true, 0);
-}
+// void stopMotorsD(){
+//   setMoteur(true, 0, true, 0);
+// }
 
-void stopMotors() {
-  // Étape 0 : Stop de sécurité
-  for (int ch = 0; ch < 4; ch++) {
-    ledcWrite(ch, 0);
-  }
-  delay(500);
+// void stopMotors() {
+//   // Étape 0 : Stop de sécurité
+//   for (int ch = 0; ch < 4; ch++) {
+//     ledcWrite(ch, 0);
+//   }
+//   delay(500);
 
-  // === 1. Avancer (tige de la flèche) ===
-  setMoteur(true, 75, true, 75);
-  delay(700);
-  stopMotorsD();
+//   // === 1. Avancer (tige de la flèche) ===
+//   setMoteur(true, 75, true, 75);
+//   delay(700);
+//   stopMotorsD();
 
-  // === 2. Arc vers la gauche (entrée de la pointe) ===
-  setMoteur(false, 60, true, 100);  // rotation gauche
-  delay(300);
-  stopMotorsD();
+//   // === 2. Arc vers la gauche (entrée de la pointe) ===
+//   setMoteur(false, 60, true, 100);  // rotation gauche
+//   delay(300);
+//   stopMotorsD();
 
-  // === 3. Long arc vers la droite (pointe principale) ===
-  setMoteur(true, 100, false, 60);  // rotation droite
-  delay(850);
-  stopMotorsD();
+//   // === 3. Long arc vers la droite (pointe principale) ===
+//   setMoteur(true, 100, false, 60);  // rotation droite
+//   delay(850);
+//   stopMotorsD();
 
-  // === 4. Arc vers la gauche EN RECULANT (fermeture de la pointe) ===
-  setMoteur(false, 170, false, 85);  // rotation gauche EN ARRIÈRE
-  delay(300);
-  stopMotorsD();
-  delay(1000);
-  // === 5. Recul final pour affiner la flèche ===
-  setMoteur(false, 50, false, 145);  // recule droit
-  delay(300);
-  stopMotorsD();
+//   // === 4. Arc vers la gauche EN RECULANT (fermeture de la pointe) ===
+//   setMoteur(false, 170, false, 85);  // rotation gauche EN ARRIÈRE
+//   delay(300);
+//   stopMotorsD();
+//   delay(1000);
+//   // === 5. Recul final pour affiner la flèche ===
+//   setMoteur(false, 50, false, 145);  // recule droit
+//   delay(300);
+//   stopMotorsD();
 
-  // Pause d'observation
-  delay(10000);
-}
+//   // Pause d'observation
+//   delay(10000);
+// }
