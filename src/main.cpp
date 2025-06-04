@@ -35,7 +35,8 @@ void loop() {
   
   int Commande_MD =0, Commande_MG =0;
 
-  if(abs(consigne_dist) <5){ //&& abs(consigne_angle) <10
+  if(mode == 1){
+    if(abs(consigne_dist) <10){ //&& abs(consigne_angle) <10
     digitalWrite(LEDU1, HIGH);
     
     Discretiser(); // modifie les consignes    
@@ -48,20 +49,33 @@ void loop() {
     PWM('G',0);
     delay(500);
     digitalWrite(LEDU1, LOW);
+    }
+  }else {
+    if(abs(consigne_dist) <5){ //&& abs(consigne_angle) <5
+    digitalWrite(LEDU1, HIGH);
+    
+    Discretiser(); // modifie les consignes    
+    i++;
+
+    Reset_pid_distance();
+    Reset_pid_angle();
+
+    PWM('D',0);
+    PWM('G',0);
+    delay(500);
+    digitalWrite(LEDU1, LOW);
+    }
   }
+  
 
   consigne_dist = sqrt(pow((consigne_pos_X-pos_X),2) + pow((consigne_pos_Y-pos_Y),2)) - DIST_STYLO; 
   consigne_angle = atan2((consigne_pos_Y-pos_Y),(consigne_pos_X-pos_X)) * RAD_TO_DEG;
 
   Get_angle();
-  
-  //PID sol
-  // Tourner(consigne_angle, 5, 0, 0);   //FIXME : regler coeff et caper les pid I
-  // Avancer(consigne_dist, 1,0, 0.05);
-  
+
   //PID ardoise
-  Tourner(consigne_angle, 5, 0.02, 0);   //FIXME : regler coeff et caper les pid I
-  Avancer(consigne_dist, 2,0.1,0.5); 
+  Tourner(consigne_angle, 8, 0.1, 0.7);   //FIXME : regler coeff et caper les pid I
+  Avancer(consigne_dist, 2.0, 0.1, 0.05); 
   
   delay(10); //attention a ne pas retirer !
 
@@ -76,16 +90,16 @@ void loop() {
   PWM('D',Commande_MD);
   PWM('G',Commande_MG);
 
-  if(DEBUG){ //TODO "ifdef etc"
+  #if DEBUG
     // DEBUG_Blink();
     // DEBUG_pwm();
     // DEBUG_encodeur();     //Teleplot
     // DEBUG_IMU();          //Teleplot
     // DEBUG_MAG();          //Teleplot
     // DEBUG_angle();        //Teleplot
-    // DEBUG_North();        //Teleplot
-    // DEBUG_PID_distance(consigne_dist);  //Teleplot
-    // DEBUG_PID_angle(consigne_angle);    //Teleplot
+    //  DEBUG_North();        //Teleplot
+    //  DEBUG_PID_distance(consigne_dist);  //Teleplot
+    //  DEBUG_PID_angle(consigne_angle);    //Teleplot
 
     Serial.print(">posx:");
     Serial.println(pos_X);
@@ -103,5 +117,6 @@ void loop() {
     Serial.println(consigne_angle);
     Serial.print(">angle:");
     Serial.println(anglerobot);
-  }
+    #endif
+  
 }

@@ -88,7 +88,7 @@ float Get_angle(){
     long delta_D = nb_tic_encodeur_D - nb_tic_encodeur_D_prec;
     long delta_G = nb_tic_encodeur_G - nb_tic_encodeur_G_prec;
 
-    float deltaAngle = (delta_D - delta_G) / facteurAngle;      // en radians
+    float deltaAngle = (delta_D - delta_G) / facteurAngle *0.5;      // en radians
     anglerobot += deltaAngle;
     anglerobot = Angle_restriction(anglerobot);
 
@@ -163,54 +163,63 @@ void Discretiser(){
 
     //Met à jour le point de départ
     if (mode > 0 && first_call) {
-        x0 = pos_X;
+        x0 = 0;
         y0 = pos_Y;
         first_call = false;
+    }else{
+        x0 = 0;
+        y0 = pos_Y;
     }
 
     switch (mode){
         case 1: { // Escalier
-            switch (i) {
-                case 0: { //Fais une ligne pour marquer le début
-                    consigne_pos_X = x0;
-                    consigne_pos_Y = y0 + 20;
-                    break;
-                }
-                case 1: {
-                    consigne_pos_X = x0;
-                    consigne_pos_Y = y0 - 20;
-                    break;
-                }
-                case 2:{
-                    consigne_pos_X = x0;
-                    consigne_pos_Y = y0;
-                    break;
-                } //Début de la figure
-                case 3: case 4: case 5: case 6: case 7:
-                    consigne_pos_X = x0 + 40 * (i - 3);
-                    consigne_pos_Y = y0;
-                    break;
-                case 8: case 9: case 10: case 11: case 12:
-                    consigne_pos_X = x0 + 200;
-                    consigne_pos_Y = y0 + 20 * (i - 8);
-                    break;
-                case 13: case 14: case 15: case 16: case 17:
-                    consigne_pos_X = x0 + 200 + 80 * (i - 13);
-                    consigne_pos_Y = y0 + 100;
-                    break;
-                case 18:{ // Fais une ligne pour marquer la fin
-                    consigne_pos_X = x0 + 600;
-                    consigne_pos_Y = y0 + 100 + 20;
-                }
-                case 19:{
-                    consigne_pos_X = x0 + 600;
-                    consigne_pos_Y = y0 + 100 - 20;
-                }
-                default:
-                    mode = 0; //= arret
-                    first_call = true;
-                    i = 0;
-                    break;
+            y0 = 0;
+            int taille = 28;
+            float tab_esca[taille][2] = {
+                {x0, y0},
+                {x0+20, y0+40},
+                {x0, y0},
+                {x0-20, y0-40},
+
+                //avancement
+                {x0+25, y0},
+                {x0+50, y0},
+                {x0+75, y0},
+                {x0+100, y0},
+                {x0+125, y0},
+                {x0+150, y0},
+                {x0+175, y0},
+                {x0+200, y0},
+
+
+                {x0+205, y0+20},
+                {x0+200, y0+40},
+                {x0+200, y0+60},
+                {x0+200, y0+80},
+                {x0+200, y0+100},
+
+                {x0+200, y0+100},
+                {x0+200, y0+100},
+                {x0+220, y0+100},
+                {x0+240, y0+100},
+                {x0+260, y0+100},
+                {x0+300, y0+100},
+                {x0+400, y0+100},
+                {x0+600, y0+100},
+
+                {x0+510, y0+140},
+                {x0+500, y0+100},
+                {x0+510, y0+80}
+            };
+
+            consigne_pos_X = tab_esca[i][0];
+            consigne_pos_Y = tab_esca[i][1];
+
+            if(i >= taille - 1){
+                mode = 0; //= arret
+                first_call = true;
+                i = 0;
+                break;
             }
             break;
         }
