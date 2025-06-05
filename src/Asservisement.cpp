@@ -345,7 +345,7 @@ void Discretiser(){
         } 
         case 5:{  //Rose des vents
             //TODO trouver le Nord
-
+            y0=0;
             int taille_lignes_consigne_windrose = 12; //Sans compter le cercle
             float tab_consignes_windrose[taille_lignes_consigne_windrose][2] = {
                 {0, 0},
@@ -382,23 +382,26 @@ void Discretiser(){
         } 
         case 6:{  //Flèche
             //TODO Trouver le Nord
+            y0=0;
 
-            int taille_lignes_consigne_fleche = 5;
+            int taille_lignes_consigne_fleche = 7;
             float tab_consignes_fleche[taille_lignes_consigne_fleche][2] = {
                 {0, 0},
-                {60, 0},
-                {40, -10},
-                {40, 10},
+                {40, 0},
+                {45, -20},
+                {60,0},
+                {40, 0},
+                {45, 20},
                 {60, 0}
             };
 
             //Pour un départ à (0, 0) :
-            // consigne_pos_X = tab_consignes_fleche[i][0]; //Colonne 0 pour les x
-            // consigne_pos_Y = tab_consignes_fleche[i][1]; //Colonne 1 pour les y
+            consigne_pos_X = tab_consignes_fleche[i][0]; //Colonne 0 pour les x
+            consigne_pos_Y = tab_consignes_fleche[i][1]; //Colonne 1 pour les y
             
             // Pour n'importe quelle coordonnées :
-            consigne_pos_X = x0 + tab_consignes_fleche[i][0]; //Colonne 0 pour les x
-            consigne_pos_Y = y0 + tab_consignes_fleche[i][1]; //Colonne 1 pour les y
+            // consigne_pos_X = x0 + tab_consignes_fleche[i][0]; //Colonne 0 pour les x
+            // consigne_pos_Y = y0 + tab_consignes_fleche[i][1]; //Colonne 1 pour les y
 
             if(i >= taille_lignes_consigne_fleche-1){
                 mode = 0; //arret
